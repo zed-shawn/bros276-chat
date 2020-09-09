@@ -28,7 +28,7 @@ export default function userDetailsScreen(props) {
   return (
     <View style={styles.root}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>bros 276</Text>
+        <Text style={styles.titleText}>bros 276pp</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
