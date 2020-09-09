@@ -8,7 +8,7 @@ import socket from "./components/socketInit";
 try {
   socket.on("connect", () => {
     if (socket.connected === true) {
-      console.log("Connected to Anton");
+      console.log("Connected to Anton Server");
     } // true
   });
 } catch (error) {
