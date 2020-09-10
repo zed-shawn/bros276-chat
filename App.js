@@ -2,6 +2,9 @@ import React from "react";
 import { enableScreens } from "react-native-screens";
 import ChatNavigator from "./navigation/main";
 import socket from "./components/socketInit";
+import store from "./state/store"
+import { Provider } from "react-redux";
+
 
 //import DeviceInfo from "react-native-device-info";
 
@@ -26,5 +29,9 @@ socket.on("response", (data) => {
 enableScreens();
 
 export default function App() {
-  return <ChatNavigator />;
+return (
+  <Provider store={store}>
+    <ChatNavigator />
+  </Provider>
+)
 }

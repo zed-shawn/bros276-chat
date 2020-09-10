@@ -1,10 +1,15 @@
 import ChatItem from "../models/chatArray";
-import initialState from "../data/defState";
+//import initialState from "./store";
 
 import socket from "../components/socketInit";
 
 const SEND_CHAT = "sendChat";
 const RECV_CHAT = "receiveChat";
+
+const initialState = {
+  user: [],
+  chatList: [],
+};
 
 let messageID = 0;
 
@@ -38,7 +43,7 @@ export function receivechat(username, message, time, color) {
   };
 }
 
-export default function chatReducer(state = initialState, action) {
+const chatReducer = (state = initialState, action) => {
   switch (action.type) {
     case SEND_CHAT:
       const newChat = new ChatItem(
@@ -54,15 +59,6 @@ export default function chatReducer(state = initialState, action) {
         chatList: (chatList) => [newChat, ...chatList],
       };
   }
-}
+};
 
-const newChatBubble = new ChatItem(
-  Math.random().toString(),
-  username,
-  inputMessage,
-  getTime()
-);
-addToChatArray((chatArray) => [newChatBubble, ...chatArray]);
-setInputMessage("");
-const dataToSend = [username, inputMessage, hours + ":" + min];
-socket.emit("message", dataToSend);
+export default chatReducer;
