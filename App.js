@@ -2,11 +2,18 @@ import React from "react";
 import { enableScreens } from "react-native-screens";
 import ChatNavigator from "./navigation/main";
 import socket from "./components/socketInit";
-import store from "./state/store"
+import store from "./state/store";
 import { Provider } from "react-redux";
+import { init } from "./helpers/db";
 
-
-//import DeviceInfo from "react-native-device-info";
+init()
+  .then(() => {
+    console.log("Database initialized");
+  })
+  .catch((err) => {
+    console.log("Database initialization failed.");
+    console.log(err);
+  });
 
 try {
   socket.on("connect", () => {
@@ -29,9 +36,9 @@ socket.on("response", (data) => {
 enableScreens();
 
 export default function App() {
-return (
-  <Provider store={store}>
-    <ChatNavigator />
-  </Provider>
-)
+  return (
+    <Provider store={store}>
+      <ChatNavigator />
+    </Provider>
+  );
 }
