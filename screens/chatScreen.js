@@ -8,18 +8,18 @@ import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
 import Button from "../components/Button";
 import socket from "../components/socketInit";
-import store from "../state/store"
-
+import store from "../state/store";
 
 import * as action from "../state/chatEngine";
 
 export default function chatScreen(props) {
-  const username = props.navigation.getParam("username");
+  const username = useSelector((state) => state.user.user.name);
+  //console.log(username);
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
 
-  const chatRepo = useSelector(state=>state.chat.chatList)
-  //console.log(chatRepo);
+  const chatRepo = useSelector((state) => state.chat.chatList);
+  //console.log(store.getState());
 
   const dispatch = useDispatch();
 
@@ -50,7 +50,7 @@ export default function chatScreen(props) {
 
       dispatchRxMessage(username, message, time, color);
 
-/*       const newChatBubble = new ChatItem(
+      /*       const newChatBubble = new ChatItem(
         receivedMessage.id.toString(),
         receivedMessage.username.toString(),
         receivedMessage.message.toString(),

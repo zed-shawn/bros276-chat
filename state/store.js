@@ -1,5 +1,6 @@
 import { createStore, combineReducers } from "redux";
 import chatReducer from "./chatEngine";
+import userReducer from "./userDetail";
 
 export const initialState = {
   user: [],
@@ -8,6 +9,7 @@ export const initialState = {
 
 const rootReducer = combineReducers({
   chat: chatReducer,
+  user: userReducer,
 });
 
 const store = createStore(rootReducer);

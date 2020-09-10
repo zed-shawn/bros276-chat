@@ -1,10 +1,11 @@
 import ChatItem from "../models/chatArray";
-//import initialState from "./store";
 
 import socket from "../components/socketInit";
 
 const initialState = {
-  user: [],
+  user: {
+    name:"Ali" ,
+  },
   chatList: [],
 };
 
@@ -13,7 +14,6 @@ const RECV_CHAT = "receiveChat";
 
 let messageID = 0;
 const getID = () => {
-  
   let newID = ++messageID;
   return newID.toString();
 };
@@ -26,6 +26,8 @@ const getTime = () => {
   }
   return hours + ":" + min;
 };
+
+
 
 export function sendchat(message) {
   return {
@@ -53,15 +55,17 @@ const chatReducer = (state = initialState, action) => {
     case SEND_CHAT:
       const newChat = new ChatItem(
         getID(),
-        "Ali",
+        state.user.name,
         action.payload.message,
         getTime()
       );
+      console.log(state.user);
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
       const dataToSend = [state.user.name, action.payload.message, getTime()];
       socket.emit("message", dataToSend);
       return { ...state, chatList: updatedTxList };
+
     case RECV_CHAT:
       const newRxChat = new ChatItem(
         getID(),
@@ -73,6 +77,7 @@ const chatReducer = (state = initialState, action) => {
       const updatedRxList = [...state.chatList];
       updatedRxList.unshift(newRxChat);
       return { ...state, chatList: updatedRxList };
+
     default:
       return state;
   }
