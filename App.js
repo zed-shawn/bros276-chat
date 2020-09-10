@@ -5,6 +5,9 @@ import socket from "./components/socketInit";
 import store from "./state/store";
 import { Provider } from "react-redux";
 import { init } from "./helpers/db";
+import * as FileSystem from "expo-file-system";
+
+console.log(FileSystem.documentDirectory);
 
 init()
   .then(() => {
