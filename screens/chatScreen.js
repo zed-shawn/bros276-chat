@@ -1,40 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { View, StyleSheet, TextInput, FlatList } from "react-native";
-//import { CHATARRAY } from "../data/dummydata";
 import ChatItem from "../models/chatArray";
 
 import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
 import Button from "../components/Button";
 import socket from "../components/socketInit";
+import store from "../state/store";
 
-const CHATARRAY = [];
-
-/* var hours = new Date().getMinutes(); //To get the Current Hours
-var min = new Date().getSeconds(); //To get the Current Minute */
+import * as action from "../state/chatEngine";
 
 export default function chatScreen(props) {
-  const username = props.navigation.getParam("username");
+  const username = useSelector((state) => state.user.user.name);
+  //console.log(username);
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
 
+  const chatRepo = useSelector((state) => state.chat.chatList);
+  //console.log(store.getState());
+
+  const dispatch = useDispatch();
+
+  const dispatchMessage = useCallback(
+    (inputMessage) => {
+      dispatch(action.sendchat(inputMessage));
+    },
+    [dispatch]
+  );
+
+  const dispatchRxMessage = useCallback(
+    (username, message, time, color) => {
+      dispatch(action.receivechat(username, message, time, color));
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     socket.on("message", (data) => {
-      console.log(data);
+      //console.log(data);
       const receivedMessage = JSON.parse(data);
       //console.log(receivedMessage);
 
-      const newChatBubble = new ChatItem(
+      let username = receivedMessage.username.toString();
+      let message = receivedMessage.message.toString();
+      let time = receivedMessage.time.toString();
+      let color = receivedMessage.color.toString();
+
+      dispatchRxMessage(username, message, time, color);
+
+      /*       const newChatBubble = new ChatItem(
         receivedMessage.id.toString(),
         receivedMessage.username.toString(),
         receivedMessage.message.toString(),
         receivedMessage.time.toString(),
         receivedMessage.color.toString()
-        //receivedMessage.time.toString()
       );
-      //CHATARRAY.unshift(newChatBubble);
-      addToChatArray((chatArray) => [newChatBubble, ...chatArray]);
+      addToChatArray((chatArray) => [newChatBubble, ...chatArray]); */
     });
   }, []);
 
@@ -42,33 +65,12 @@ export default function chatScreen(props) {
     setInputMessage(inputText);
   };
 
-  var hours = new Date().getHours(); //To get the Current Hours
-  var min = new Date().getMinutes(); //To get the Current Minute
-
-  const getTime = () => {
-    var hours = new Date().getHours(); //To get the Current Hours
-    var min = new Date().getMinutes(); //To get the Current Minute
-    if (min < 10) {
-      min = "0" + min;
-    }
-    return hours + ":" + min;
-  };
-
   const sendHandler = () => {
     if (inputMessage !== "") {
-      console.log("button preseed");
-      const newChatBubble = new ChatItem(
-        Math.random().toString(),
-        username,
-        inputMessage,
-        getTime()
-      );
-      addToChatArray((chatArray) => [newChatBubble, ...chatArray]);
-      //CHATARRAY.unshift(newChatBubble);
-      //CHATARRAY=[newChatBubble,...CHATARRAY]
+      let message = inputMessage;
       setInputMessage("");
-      const dataToSend = [username, inputMessage, hours + ":" + min];
-      socket.emit("message", dataToSend);
+      console.log("button preseed");
+      dispatchMessage(message);
     }
   };
 
@@ -96,7 +98,7 @@ export default function chatScreen(props) {
     <View style={styles.root}>
       <FlatList
         renderItem={renderChatItems}
-        data={chatArray}
+        data={chatRepo}
         keyExtractor={(item, index) => item.id}
         inverted={true}
       />

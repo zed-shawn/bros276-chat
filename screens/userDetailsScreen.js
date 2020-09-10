@@ -1,22 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { View, StyleSheet, Text, TextInput, Button } from "react-native";
+import { useDispatch} from "react-redux";
+
+import { addName } from "../state/userDetail";
 
 import socket from "../components/socketInit";
 
-const identifier =Math.random().toString()
-console.log(identifier);
-
+const identifier = Math.random().toString();
+//console.log(identifier);
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
+  const dispatch = useDispatch();
 
   const textInputHandler = (inputText) => {
     setEnteredName(inputText);
   };
 
+  const dispatchUsername = useCallback(
+    (username) => {
+      dispatch(addName(username));
+    },
+    [dispatch]
+  );
+
   const inputButtonHandler = () => {
-    const sendFromUserDetails=[identifier,enteredName]
+    const sendFromUserDetails = [identifier, enteredName];
     socket.emit("identifier", sendFromUserDetails);
+    dispatchUsername(enteredName);
 
     props.navigation.navigate({
       routeName: "Chat",
