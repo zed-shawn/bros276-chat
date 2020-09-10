@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { View, StyleSheet, TextInput, FlatList } from "react-native";
-//import { CHATARRAY } from "../data/dummydata";
 import ChatItem from "../models/chatArray";
 
 import ChatBubbleSend from "../components/chatBubbleSend";
@@ -9,15 +9,14 @@ import ChatBubbleReceive from "../components/chatBubbleReceive";
 import Button from "../components/Button";
 import socket from "../components/socketInit";
 
-const CHATARRAY = [];
-
-/* var hours = new Date().getMinutes(); //To get the Current Hours
-var min = new Date().getSeconds(); //To get the Current Minute */
+import * as action from "../state/chatEngine";
 
 export default function chatScreen(props) {
   const username = props.navigation.getParam("username");
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     socket.on("message", (data) => {
@@ -31,9 +30,7 @@ export default function chatScreen(props) {
         receivedMessage.message.toString(),
         receivedMessage.time.toString(),
         receivedMessage.color.toString()
-        //receivedMessage.time.toString()
       );
-      //CHATARRAY.unshift(newChatBubble);
       addToChatArray((chatArray) => [newChatBubble, ...chatArray]);
     });
   }, []);
@@ -41,9 +38,6 @@ export default function chatScreen(props) {
   const textInputHandler = (inputText) => {
     setInputMessage(inputText);
   };
-
-  var hours = new Date().getHours(); //To get the Current Hours
-  var min = new Date().getMinutes(); //To get the Current Minute
 
   const getTime = () => {
     var hours = new Date().getHours(); //To get the Current Hours
@@ -54,21 +48,19 @@ export default function chatScreen(props) {
     return hours + ":" + min;
   };
 
+  const dispatchMessage = useCallback(
+    (inputMessage) => {
+      dispatch(action.sendchat(inputMessage));
+    },
+    [dispatch]
+  );
+
   const sendHandler = () => {
     if (inputMessage !== "") {
-      console.log("button preseed");
-      const newChatBubble = new ChatItem(
-        Math.random().toString(),
-        username,
-        inputMessage,
-        getTime()
-      );
-      addToChatArray((chatArray) => [newChatBubble, ...chatArray]);
-      //CHATARRAY.unshift(newChatBubble);
-      //CHATARRAY=[newChatBubble,...CHATARRAY]
+      let message = inputMessage;
       setInputMessage("");
-      const dataToSend = [username, inputMessage, hours + ":" + min];
-      socket.emit("message", dataToSend);
+      console.log("button preseed");
+      dispatchMessage(message);
     }
   };
 
