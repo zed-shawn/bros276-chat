@@ -10,5 +10,5 @@ const rootReducer = combineReducers({
   chat: chatReducer,
 });
 
-const store = createStore(chatReducer);
+const store = createStore(rootReducer);
 export default store;

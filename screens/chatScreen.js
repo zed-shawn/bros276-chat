@@ -8,6 +8,8 @@ import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
 import Button from "../components/Button";
 import socket from "../components/socketInit";
+import store from "../state/store"
+
 
 import * as action from "../state/chatEngine";
 
@@ -16,37 +18,10 @@ export default function chatScreen(props) {
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
 
+  const chatRepo = useSelector(state=>state.chat.chatList)
+  //console.log(chatRepo);
+
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    socket.on("message", (data) => {
-      console.log(data);
-      const receivedMessage = JSON.parse(data);
-      //console.log(receivedMessage);
-
-      const newChatBubble = new ChatItem(
-        receivedMessage.id.toString(),
-        receivedMessage.username.toString(),
-        receivedMessage.message.toString(),
-        receivedMessage.time.toString(),
-        receivedMessage.color.toString()
-      );
-      addToChatArray((chatArray) => [newChatBubble, ...chatArray]);
-    });
-  }, []);
-
-  const textInputHandler = (inputText) => {
-    setInputMessage(inputText);
-  };
-
-  const getTime = () => {
-    var hours = new Date().getHours(); //To get the Current Hours
-    var min = new Date().getMinutes(); //To get the Current Minute
-    if (min < 10) {
-      min = "0" + min;
-    }
-    return hours + ":" + min;
-  };
 
   const dispatchMessage = useCallback(
     (inputMessage) => {
@@ -54,6 +29,41 @@ export default function chatScreen(props) {
     },
     [dispatch]
   );
+
+  const dispatchRxMessage = useCallback(
+    (username, message, time, color) => {
+      dispatch(action.receivechat(username, message, time, color));
+    },
+    [dispatch]
+  );
+
+  useEffect(() => {
+    socket.on("message", (data) => {
+      //console.log(data);
+      const receivedMessage = JSON.parse(data);
+      //console.log(receivedMessage);
+
+      let username = receivedMessage.username.toString();
+      let message = receivedMessage.message.toString();
+      let time = receivedMessage.time.toString();
+      let color = receivedMessage.color.toString();
+
+      dispatchRxMessage(username, message, time, color);
+
+/*       const newChatBubble = new ChatItem(
+        receivedMessage.id.toString(),
+        receivedMessage.username.toString(),
+        receivedMessage.message.toString(),
+        receivedMessage.time.toString(),
+        receivedMessage.color.toString()
+      );
+      addToChatArray((chatArray) => [newChatBubble, ...chatArray]); */
+    });
+  }, []);
+
+  const textInputHandler = (inputText) => {
+    setInputMessage(inputText);
+  };
 
   const sendHandler = () => {
     if (inputMessage !== "") {
@@ -88,7 +98,7 @@ export default function chatScreen(props) {
     <View style={styles.root}>
       <FlatList
         renderItem={renderChatItems}
-        data={chatArray}
+        data={chatRepo}
         keyExtractor={(item, index) => item.id}
         inverted={true}
       />
