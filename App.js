@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 import { init } from "./helpers/db";
 import * as FileSystem from "expo-file-system";
 
-console.log(FileSystem.documentDirectory);
+//console.log(FileSystem.documentDirectory);
 
 init()
   .then(() => {

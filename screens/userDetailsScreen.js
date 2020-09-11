@@ -1,13 +1,11 @@
 import React, { useState, useCallback } from "react";
 import { View, StyleSheet, Text, TextInput, Button } from "react-native";
 import { useDispatch} from "react-redux";
+import MD5 from "../helpers/md5"
 
-import { addName } from "../state/userDetail";
+import userReducer, { addName } from "../state/userDetail";
 
 import socket from "../components/socketInit";
-
-const identifier = Math.random().toString();
-//console.log(identifier);
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
@@ -18,16 +16,17 @@ export default function userDetailsScreen(props) {
   };
 
   const dispatchUsername = useCallback(
-    (username) => {
-      dispatch(addName(username));
+    (identifier, username) => {
+      dispatch(addName(identifier, username));
     },
     [dispatch]
   );
 
   const inputButtonHandler = () => {
-    const sendFromUserDetails = [identifier, enteredName];
-    socket.emit("identifier", sendFromUserDetails);
-    dispatchUsername(enteredName);
+    const userToLower= enteredName.toLowerCase()
+    console.log(`${userToLower}`);
+    const identifier = MD5(`${userToLower}`)
+    dispatchUsername(identifier,enteredName);
 
     props.navigation.navigate({
       routeName: "Chat",
