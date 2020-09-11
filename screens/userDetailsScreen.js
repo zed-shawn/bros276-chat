@@ -3,9 +3,7 @@ import { View, StyleSheet, Text, TextInput, Button } from "react-native";
 import { useDispatch} from "react-redux";
 import MD5 from "../helpers/md5"
 
-import userReducer, { addName } from "../state/userDetail";
-
-import socket from "../components/socketInit";
+import { addName } from "../state/userDetail";
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
@@ -24,7 +22,6 @@ export default function userDetailsScreen(props) {
 
   const inputButtonHandler = () => {
     const userToLower= enteredName.toLowerCase()
-    console.log(`${userToLower}`);
     const identifier = MD5(`${userToLower}`)
     dispatchUsername(identifier,enteredName);
 

@@ -4,7 +4,8 @@ import socket from "../components/socketInit";
 
 const initialState = {
   user: {
-    name:"Ali" ,
+    name: "Ali",
+    identifier: "",
   },
   chatList: [],
 };

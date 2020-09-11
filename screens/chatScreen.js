@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { View, StyleSheet, TextInput, FlatList } from "react-native";
-import ChatItem from "../models/chatArray";
 
 import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
@@ -14,13 +13,10 @@ import * as action from "../state/chatEngine";
 
 export default function chatScreen(props) {
   const username = useSelector((state) => state.user.user.name);
-  //console.log(username);
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
 
   const chatRepo = useSelector((state) => state.chat.chatList);
-  //console.log(store.getState());
-
   const dispatch = useDispatch();
 
   const dispatchMessage = useCallback(
@@ -39,10 +35,9 @@ export default function chatScreen(props) {
 
   useEffect(() => {
     socket.on("message", (data) => {
-      //console.log(data);
-      const receivedMessage = JSON.parse(data);
-      //console.log(receivedMessage);
 
+      const receivedMessage = JSON.parse(data);
+      
       let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
       let time = receivedMessage.time.toString();
@@ -50,14 +45,6 @@ export default function chatScreen(props) {
 
       dispatchRxMessage(username, message, time, color);
 
-      /*       const newChatBubble = new ChatItem(
-        receivedMessage.id.toString(),
-        receivedMessage.username.toString(),
-        receivedMessage.message.toString(),
-        receivedMessage.time.toString(),
-        receivedMessage.color.toString()
-      );
-      addToChatArray((chatArray) => [newChatBubble, ...chatArray]); */
     });
   }, []);
 
