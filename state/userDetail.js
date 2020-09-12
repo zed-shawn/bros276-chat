@@ -46,17 +46,17 @@ export function sendchat(message) {
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_NAME:
-      /* const sendFromUserDetails = [
+      const sendFromUserDetails = [
         action.payload.identifier,
         action.payload.username,
       ];
       socket.emit("identifier", sendFromUserDetails);
       console.log(sendFromUserDetails);
-      const updatedUser = {
+      /* const updatedUser = {
         name: action.payload.username,
         identifier: action.payload.identifier,
       };
-      return { ...state, user: updatedUser }; */
+      //return { ...state, user: updatedUser }; */
       return state;
     default:
       return state;
