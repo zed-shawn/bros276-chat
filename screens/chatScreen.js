@@ -70,10 +70,10 @@ export default function chatScreen(props) {
       let message = inputMessage;
       setInputMessage("");
       console.log("button preseed");
-      //dispatchMessage(message);
-      const dataToSend = ["Ali", message, getTime()];
+      dispatchMessage(message);
+      /* const dataToSend = ["Ali", message, getTime()];
       console.log(dataToSend);
-      socket.emit("message", dataToSend);
+      socket.emit("message", dataToSend); */
     }
   };
 

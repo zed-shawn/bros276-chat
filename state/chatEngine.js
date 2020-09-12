@@ -38,7 +38,7 @@ export function fetchName() {
       const dbResult = await getName();
       //console.log(dbResult);
       let array = dbResult.rows._array;
-      username = array[0].name;
+      username = array[0].name.toString();
       //console.log(username);
       //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
     } catch (err) {
@@ -85,12 +85,16 @@ const chatReducer = (state = initialState, action) => {
         action.payload.message,
         getTime()
       );
+      const updatedTxList = [...state.chatList];
+      updatedTxList.unshift(newChat);
+      const dataToSend = [username, action.payload.message, getTime()];
+      console.log(dataToSend);
+      socket.emit("message", dataToSend);
       /* const dataToSend = [username, action.payload.message, getTime()];
       console.log(dataToSend);
       socket.emit("message", dataToSend); */
       //console.log(state.user);
-      const updatedTxList = [...state.chatList];
-      updatedTxList.unshift(newChat);
+
 
       return { ...state, chatList: updatedTxList };
 
