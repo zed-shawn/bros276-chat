@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { View, StyleSheet, TextInput, FlatList } from "react-native";
-import ChatItem from "../models/chatArray";
 
 import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
@@ -12,16 +11,26 @@ import store from "../state/store";
 
 import * as action from "../state/chatEngine";
 
+const getTime = () => {
+  var hours = new Date().getHours(); //To get the Current Hours
+  var min = new Date().getMinutes(); //To get the Current Minute
+  if (min < 10) {
+    min = "0" + min;
+  }
+  return hours + ":" + min;
+};
+
 export default function chatScreen(props) {
   const username = useSelector((state) => state.user.user.name);
-  //console.log(username);
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
 
   const chatRepo = useSelector((state) => state.chat.chatList);
-  //console.log(store.getState());
-
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(action.fetchName());
+  }, [dispatch]);
 
   const dispatchMessage = useCallback(
     (inputMessage) => {
@@ -39,9 +48,8 @@ export default function chatScreen(props) {
 
   useEffect(() => {
     socket.on("message", (data) => {
-      //console.log(data);
+
       const receivedMessage = JSON.parse(data);
-      //console.log(receivedMessage);
 
       let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
@@ -50,14 +58,6 @@ export default function chatScreen(props) {
 
       dispatchRxMessage(username, message, time, color);
 
-      /*       const newChatBubble = new ChatItem(
-        receivedMessage.id.toString(),
-        receivedMessage.username.toString(),
-        receivedMessage.message.toString(),
-        receivedMessage.time.toString(),
-        receivedMessage.color.toString()
-      );
-      addToChatArray((chatArray) => [newChatBubble, ...chatArray]); */
     });
   }, []);
 
@@ -71,6 +71,9 @@ export default function chatScreen(props) {
       setInputMessage("");
       console.log("button preseed");
       dispatchMessage(message);
+      /* const dataToSend = ["Ali", message, getTime()];
+      console.log(dataToSend);
+      socket.emit("message", dataToSend); */
     }
   };
 

@@ -1,16 +1,21 @@
 import ChatItem from "../models/chatArray";
 
 import socket from "../components/socketInit";
+import { getName } from "../helpers/db";
+
+var username = "null";
 
 const initialState = {
   user: {
-    name:"Ali" ,
+    name: "",
+    identifier: "",
   },
   chatList: [],
 };
 
 const SEND_CHAT = "sendChat";
 const RECV_CHAT = "receiveChat";
+const GET_NAME = "fetchName";
 
 let messageID = 0;
 const getID = () => {
@@ -27,26 +32,47 @@ const getTime = () => {
   return hours + ":" + min;
 };
 
-
+export function fetchName() {
+  return async (dispatch) => {
+    try {
+      const dbResult = await getName();
+      //console.log(dbResult);
+      let array = dbResult.rows._array;
+      username = array[0].name.toString();
+      //console.log(username);
+      //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
+    } catch (err) {
+      throw err;
+    }
+  };
+}
 
 export function sendchat(message) {
-  return {
-    type: SEND_CHAT,
-    payload: {
-      message,
-    },
+  return (dispatch) => {
+    /* const dataToSend = [username, message, getTime()];
+    console.log(username);
+    socket.emit("message", dataToSend); */
+    dispatch({
+      type: SEND_CHAT,
+      payload: {
+        message,
+      },
+    });
   };
 }
 
 export function receivechat(username, message, time, color) {
-  return {
-    type: RECV_CHAT,
-    payload: {
-      username,
-      message,
-      time,
-      color,
-    },
+  return (dispatch) => {
+    //add async code
+    dispatch({
+      type: RECV_CHAT,
+      payload: {
+        username,
+        message,
+        time,
+        color,
+      },
+    });
   };
 }
 
@@ -59,11 +85,17 @@ const chatReducer = (state = initialState, action) => {
         action.payload.message,
         getTime()
       );
-      console.log(state.user);
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
-      const dataToSend = [state.user.name, action.payload.message, getTime()];
+      const dataToSend = [username, action.payload.message, getTime()];
+      console.log(dataToSend);
       socket.emit("message", dataToSend);
+      /* const dataToSend = [username, action.payload.message, getTime()];
+      console.log(dataToSend);
+      socket.emit("message", dataToSend); */
+      //console.log(state.user);
+
+
       return { ...state, chatList: updatedTxList };
 
     case RECV_CHAT:

@@ -1,4 +1,6 @@
-import { createStore, combineReducers } from "redux";
+import { createStore, combineReducers,applyMiddleware } from "redux";
+import ReduxThunk from 'redux-thunk'
+
 import chatReducer from "./chatEngine";
 import userReducer from "./userDetail";
 
@@ -12,5 +14,5 @@ const rootReducer = combineReducers({
   user: userReducer,
 });
 
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 export default store;
