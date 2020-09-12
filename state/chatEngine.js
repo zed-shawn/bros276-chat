@@ -1,10 +1,13 @@
 import ChatItem from "../models/chatArray";
 
 import socket from "../components/socketInit";
+import { getName } from "../helpers/db";
+
+var username = "null";
 
 const initialState = {
   user: {
-    name: "Ali",
+    name: "",
     identifier: "",
   },
   chatList: [],
@@ -12,6 +15,7 @@ const initialState = {
 
 const SEND_CHAT = "sendChat";
 const RECV_CHAT = "receiveChat";
+const GET_NAME = "fetchName";
 
 let messageID = 0;
 const getID = () => {
@@ -28,10 +32,26 @@ const getTime = () => {
   return hours + ":" + min;
 };
 
+export function fetchName() {
+  return async (dispatch) => {
+    try {
+      const dbResult = await getName();
+      //console.log(dbResult);
+      let array = dbResult.rows._array;
+      username = array[0].name;
+      //console.log(username);
+      //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
+    } catch (err) {
+      throw err;
+    }
+  };
+}
+
 export function sendchat(message) {
   return (dispatch) => {
-    const dataToSend = [message, message, getTime()];
-      socket.emit("message", dataToSend);
+    /* const dataToSend = [username, message, getTime()];
+    console.log(username);
+    socket.emit("message", dataToSend); */
     dispatch({
       type: SEND_CHAT,
       payload: {
@@ -65,10 +85,13 @@ const chatReducer = (state = initialState, action) => {
         action.payload.message,
         getTime()
       );
-      console.log(state.user);
+      /* const dataToSend = [username, action.payload.message, getTime()];
+      console.log(dataToSend);
+      socket.emit("message", dataToSend); */
+      //console.log(state.user);
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
-      
+
       return { ...state, chatList: updatedTxList };
 
     case RECV_CHAT:

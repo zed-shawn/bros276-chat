@@ -11,6 +11,15 @@ import store from "../state/store";
 
 import * as action from "../state/chatEngine";
 
+const getTime = () => {
+  var hours = new Date().getHours(); //To get the Current Hours
+  var min = new Date().getMinutes(); //To get the Current Minute
+  if (min < 10) {
+    min = "0" + min;
+  }
+  return hours + ":" + min;
+};
+
 export default function chatScreen(props) {
   const username = useSelector((state) => state.user.user.name);
   const [inputMessage, setInputMessage] = useState("");
@@ -18,6 +27,10 @@ export default function chatScreen(props) {
 
   const chatRepo = useSelector((state) => state.chat.chatList);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(action.fetchName());
+  }, [dispatch]);
 
   const dispatchMessage = useCallback(
     (inputMessage) => {
@@ -37,7 +50,7 @@ export default function chatScreen(props) {
     socket.on("message", (data) => {
 
       const receivedMessage = JSON.parse(data);
-      
+
       let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
       let time = receivedMessage.time.toString();
@@ -57,7 +70,10 @@ export default function chatScreen(props) {
       let message = inputMessage;
       setInputMessage("");
       console.log("button preseed");
-      dispatchMessage(message);
+      //dispatchMessage(message);
+      const dataToSend = ["Ali", message, getTime()];
+      console.log(dataToSend);
+      socket.emit("message", dataToSend);
     }
   };
 
