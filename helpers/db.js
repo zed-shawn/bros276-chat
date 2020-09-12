@@ -8,8 +8,8 @@ export const init = () => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS chatStore (id INTEGER PRIMARY KEY NOT NULL, sender TEXT NOT NULL, content TEXT NOT NULL, timestamp TEXT NOT NULL, color TEXT);",
         [],
-        () => {
-          resolve();
+        (_, result) => {
+          resolve(result);
         },
         (_, err) => {
           reject(err);
@@ -18,10 +18,10 @@ export const init = () => {
     });
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS userDetail (hashID TEXT PRIMARY KEY, name TEXT NOT NULL, number INTEGER NOT NULL, token TEXT NOT NULL);",
+        "CREATE TABLE IF NOT EXISTS userDetail (hashID TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL);",
         [],
-        () => {
-          resolve();
+        (_, result) => {
+          resolve(result);
         },
         (_, err) => {
           reject(err);
@@ -32,4 +32,20 @@ export const init = () => {
   return promise;
 };
 
-//export const addUserDetails = ()
+export const addUserDetails = (hashID, name) => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO userDetail (hashID, name) VALUES (?,?);",
+        [hashID,name],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};

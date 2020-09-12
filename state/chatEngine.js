@@ -28,26 +28,31 @@ const getTime = () => {
   return hours + ":" + min;
 };
 
-
-
 export function sendchat(message) {
-  return {
-    type: SEND_CHAT,
-    payload: {
-      message,
-    },
+  return (dispatch) => {
+    const dataToSend = [message, message, getTime()];
+      socket.emit("message", dataToSend);
+    dispatch({
+      type: SEND_CHAT,
+      payload: {
+        message,
+      },
+    });
   };
 }
 
 export function receivechat(username, message, time, color) {
-  return {
-    type: RECV_CHAT,
-    payload: {
-      username,
-      message,
-      time,
-      color,
-    },
+  return (dispatch) => {
+    //add async code
+    dispatch({
+      type: RECV_CHAT,
+      payload: {
+        username,
+        message,
+        time,
+        color,
+      },
+    });
   };
 }
 
@@ -63,8 +68,7 @@ const chatReducer = (state = initialState, action) => {
       console.log(state.user);
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
-      const dataToSend = [state.user.name, action.payload.message, getTime()];
-      socket.emit("message", dataToSend);
+      
       return { ...state, chatList: updatedTxList };
 
     case RECV_CHAT:
