@@ -11,15 +11,6 @@ import store from "../state/store";
 
 import * as action from "../state/chatEngine";
 
-const getTime = () => {
-  var hours = new Date().getHours(); //To get the Current Hours
-  var min = new Date().getMinutes(); //To get the Current Minute
-  if (min < 10) {
-    min = "0" + min;
-  }
-  return hours + ":" + min;
-};
-
 export default function chatScreen(props) {
   const username = useSelector((state) => state.user.user.name);
   const [inputMessage, setInputMessage] = useState("");
@@ -71,9 +62,6 @@ export default function chatScreen(props) {
       setInputMessage("");
       console.log("button preseed");
       dispatchMessage(message);
-      /* const dataToSend = ["Ali", message, getTime()];
-      console.log(dataToSend);
-      socket.emit("message", dataToSend); */
     }
   };
 

@@ -3,7 +3,7 @@ import ChatItem from "../models/chatArray";
 import socket from "../components/socketInit";
 import { getName } from "../helpers/db";
 
-var username = "null";
+var username ;
 
 const initialState = {
   user: {
