@@ -20,7 +20,7 @@ export default function chatScreen(props) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(action.fetchName());
+    dispatch(action.loadChat());
   }, [dispatch]);
 
   const dispatchMessage = useCallback(
@@ -39,7 +39,6 @@ export default function chatScreen(props) {
 
   useEffect(() => {
     socket.on("message", (data) => {
-
       const receivedMessage = JSON.parse(data);
 
       let username = receivedMessage.username.toString();
@@ -48,7 +47,6 @@ export default function chatScreen(props) {
       let color = receivedMessage.color.toString();
 
       dispatchRxMessage(username, message, time, color);
-
     });
   }, []);
 

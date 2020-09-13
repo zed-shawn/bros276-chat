@@ -40,7 +40,6 @@ export const init = () => {
         }
       );
     });
-    
   });
   return promise;
 };
@@ -86,6 +85,60 @@ export const getName = () => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT name FROM userDetail",
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};
+
+export const addChatTile = (id, sender, content, timestamp, color) => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO chatStore (id, sender , content , timestamp , color ) VALUES(?,?,?,?,?);",
+        [id, sender, content, timestamp, color],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};
+
+export const getRowNum = () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT COUNT (id) FROM chatStore;",
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};
+
+export const getChats = () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM chatStore",
         [],
         (_, result) => {
           resolve(result);

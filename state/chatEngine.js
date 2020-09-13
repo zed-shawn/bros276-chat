@@ -1,9 +1,9 @@
 import ChatItem from "../models/chatArray";
 
 import socket from "../components/socketInit";
-import { getName } from "../helpers/db";
+import { getName, addChatTile, getChats, getRowNum } from "../helpers/db";
 
-var username ;
+var username;
 
 const initialState = {
   user: {
@@ -16,10 +16,16 @@ const initialState = {
 const SEND_CHAT = "sendChat";
 const RECV_CHAT = "receiveChat";
 const GET_NAME = "fetchName";
+const LOAD_CHAT = "loadChat";
 
-let messageID = 0;
-const getID = () => {
-  let newID = ++messageID;
+let messageIdChat = 0;
+let messageIdScreen = 0;
+const getIdChat = () => {
+  let newID = ++messageIdChat;
+  return newID;
+};
+const getIdScreen = () => {
+  let newID = ++messageIdScreen;
   return newID.toString();
 };
 
@@ -42,16 +48,19 @@ export function fetchName() {
       //console.log(username);
       //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
     } catch (err) {
-      throw err;
+      console.log(err);;
     }
   };
 }
 
 export function sendchat(message) {
-  return (dispatch) => {
-    /* const dataToSend = [username, message, getTime()];
-    console.log(username);
-    socket.emit("message", dataToSend); */
+  return async (dispatch) => {
+    try {
+      await addChatTile(getIdChat(), username, message, getTime());
+      //console.log(userDbResult);
+    } catch (error) {
+      console.log(error);;
+    }
     dispatch({
       type: SEND_CHAT,
       payload: {
@@ -62,8 +71,13 @@ export function sendchat(message) {
 }
 
 export function receivechat(username, message, time, color) {
-  return (dispatch) => {
-    //add async code
+  return async (dispatch) => {
+    try {
+      await addChatTile(getIdChat(), username, message, time, color);
+      //console.log(userDbResult);
+    } catch (error) {
+      console.log(error);;
+    }
     dispatch({
       type: RECV_CHAT,
       payload: {
@@ -76,11 +90,39 @@ export function receivechat(username, message, time, color) {
   };
 }
 
+export function loadChat() {
+  return async (dispatch) => {
+    try {
+      const dbChatRaw = await getChats();
+      const dbChat = dbChatRaw.rows._array;
+
+      const rowNum = await getRowNum();
+      // socket.emit("rowNum", rowNum);
+      messageIdScreen = rowNum - 1;
+      messageIdChat = rowNum - 1;
+
+      const dbName = await getName();
+      //console.log(dbResult);
+      let array = dbName.rows._array;
+      username = array[0].name.toString();
+
+      dispatch({
+        type: LOAD_CHAT,
+        payload: {
+          dbChat,
+        },
+      });
+    } catch (error) {
+      console.log(error);;
+    }
+  };
+}
+
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
     case SEND_CHAT:
       const newChat = new ChatItem(
-        getID(),
+        getIdScreen(),
         state.user.name,
         action.payload.message,
         getTime()
@@ -88,19 +130,13 @@ const chatReducer = (state = initialState, action) => {
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
       const dataToSend = [username, action.payload.message, getTime()];
-      console.log(dataToSend);
+      //console.log(dataToSend);
       socket.emit("message", dataToSend);
-      /* const dataToSend = [username, action.payload.message, getTime()];
-      console.log(dataToSend);
-      socket.emit("message", dataToSend); */
-      //console.log(state.user);
-
-
       return { ...state, chatList: updatedTxList };
 
     case RECV_CHAT:
       const newRxChat = new ChatItem(
-        getID(),
+        getIdScreen(),
         action.payload.username.toString(),
         action.payload.message.toString(),
         action.payload.time.toString(),
@@ -109,6 +145,15 @@ const chatReducer = (state = initialState, action) => {
       const updatedRxList = [...state.chatList];
       updatedRxList.unshift(newRxChat);
       return { ...state, chatList: updatedRxList };
+
+    case LOAD_CHAT:
+      return {
+        ...state,
+        chatList: action.payload.dbChat.map(
+          (ch) =>
+            new ChatItem(ch.id.toString(), ch.sender, ch.content, ch.timestamp)
+        ),
+      };
 
     default:
       return state;
