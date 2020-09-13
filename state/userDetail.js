@@ -14,7 +14,7 @@ const ADD_NAME = "addName";
 export function addName(identifier, username) {
   return async (dispatch) => {
     try {
-      const userDbResult = await addUserDetails(identifier, username);
+      await addUserDetails(identifier, username);
       //console.log(userDbResult);
     } catch (error) {
       throw (error);
@@ -30,19 +30,6 @@ export function addName(identifier, username) {
   };
 }
 
-export function sendchat(message) {
-  return (dispatch) => {
-    const dataToSend = [message, message, getTime()];
-    socket.emit("message", dataToSend);
-    dispatch({
-      type: SEND_CHAT,
-      payload: {
-        message,
-      },
-    });
-  };
-}
-
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case ADD_NAME:
@@ -51,12 +38,7 @@ const userReducer = (state = initialState, action) => {
         action.payload.username,
       ];
       socket.emit("identifier", sendFromUserDetails);
-      console.log(sendFromUserDetails);
-      /* const updatedUser = {
-        name: action.payload.username,
-        identifier: action.payload.identifier,
-      };
-      //return { ...state, user: updatedUser }; */
+      //console.log(sendFromUserDetails);
       return state;
     default:
       return state;
