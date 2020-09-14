@@ -4,7 +4,8 @@ const db = SQLite.openDatabase("local.db");
 
 export const init = () => {
   const promise = new Promise((resolve, reject) => {
-    /* db.transaction((tx) => {
+    ///*
+    db.transaction((tx) => {
       tx.executeSql(
         "DROP TABLE chatStore",
         [],
@@ -15,7 +16,8 @@ export const init = () => {
           reject(err);
         }
       );
-    }); */
+    });
+    //*/
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS chatStore (id INTEGER PRIMARY KEY NOT NULL, sender TEXT NOT NULL, content TEXT NOT NULL, timestamp TEXT NOT NULL, color TEXT);",
