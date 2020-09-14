@@ -48,7 +48,7 @@ export function fetchName() {
       //console.log(username);
       //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
     } catch (err) {
-      console.log(err);;
+      console.log(err);
     }
   };
 }
@@ -59,7 +59,7 @@ export function sendchat(message) {
       await addChatTile(getIdChat(), username, message, getTime());
       //console.log(userDbResult);
     } catch (error) {
-      console.log(error);;
+      console.log(error);
     }
     dispatch({
       type: SEND_CHAT,
@@ -76,7 +76,7 @@ export function receivechat(username, message, time, color) {
       await addChatTile(getIdChat(), username, message, time, color);
       //console.log(userDbResult);
     } catch (error) {
-      console.log(error);;
+      console.log(error);
     }
     dispatch({
       type: RECV_CHAT,
@@ -95,17 +95,21 @@ export function loadChat() {
     try {
       const dbChatRaw = await getChats();
       const dbChat = dbChatRaw.rows._array;
+      console.log(dbChat);
 
-      const rowNum = await getRowNum();
+      const rowNumRaw = await getRowNum();
       // socket.emit("rowNum", rowNum);
-      messageIdScreen = rowNum - 1;
-      messageIdChat = rowNum - 1;
+      const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"]
+      console.log(rowNum);
+
+      messageIdScreen = rowNum ;
+      messageIdChat = rowNum;
 
       const dbName = await getName();
-      //console.log(dbResult);
+
       let array = dbName.rows._array;
       username = array[0].name.toString();
-
+      console.log(username);
       dispatch({
         type: LOAD_CHAT,
         payload: {
@@ -113,7 +117,7 @@ export function loadChat() {
         },
       });
     } catch (error) {
-      console.log(error);;
+      console.log(error);
     }
   };
 }
