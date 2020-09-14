@@ -1,5 +1,5 @@
 import socket from "../components/socketInit";
-import { addUserDetails } from "../helpers/db";
+import { addUserDetails, getRowNum } from "../helpers/db";
 
 const initialState = {
   user: {
@@ -17,7 +17,7 @@ export function addName(identifier, username) {
       await addUserDetails(identifier, username);
       //console.log(userDbResult);
     } catch (error) {
-      throw (error);
+      console.log(error);
     }
 
     dispatch({
@@ -27,6 +27,26 @@ export function addName(identifier, username) {
         username,
       },
     });
+  };
+}
+
+export function sendChatStatus() {
+  return async (dispatch) => {
+    try {
+      const rowNum = await getRowNum();
+      //console.log(userDbResult);
+     // socket.emit("rowNum", rowNum);
+    } catch (error) {
+      console.log(error);;
+    }
+
+    /* dispatch({
+      type: ADD_NAME,
+      payload: {
+        identifier,
+        username,
+      },
+    }); */
   };
 }
 

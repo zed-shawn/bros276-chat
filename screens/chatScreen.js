@@ -8,11 +8,29 @@ import ChatBubbleReceive from "../components/chatBubbleReceive";
 import Button from "../components/Button";
 import socket from "../components/socketInit";
 import store from "../state/store";
+import { getName} from "../helpers/db";
 
 import * as action from "../state/chatEngine";
 
+/* function fetchName() {
+  return async () => {
+    try {
+      const dbResult = await getName();
+      console.log(dbResult);
+      //let array = dbResult.rows._array;
+      //username = array[0].name.toString();
+      //console.log(username);
+      //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+} */
+
 export default function chatScreen(props) {
-  const username = useSelector((state) => state.user.user.name);
+  const username = props.navigation.getParam("username");
+  //console.log(username)
+  /* fetchName() */
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
 
@@ -20,7 +38,8 @@ export default function chatScreen(props) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(action.fetchName());
+    dispatch(action.loadChat());
+    dispatch(action.fetchName())
   }, [dispatch]);
 
   const dispatchMessage = useCallback(
@@ -39,7 +58,6 @@ export default function chatScreen(props) {
 
   useEffect(() => {
     socket.on("message", (data) => {
-
       const receivedMessage = JSON.parse(data);
 
       let username = receivedMessage.username.toString();
@@ -48,7 +66,6 @@ export default function chatScreen(props) {
       let color = receivedMessage.color.toString();
 
       dispatchRxMessage(username, message, time, color);
-
     });
   }, []);
 
