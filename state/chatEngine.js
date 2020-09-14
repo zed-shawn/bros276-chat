@@ -45,11 +45,18 @@ export function fetchName() {
       //console.log(dbResult);
       let array = dbResult.rows._array;
       username = array[0].name.toString();
+
       //console.log(username);
       //dispatch({ type: SET_PLACES, places: dbResult.rows._array });
     } catch (err) {
       console.log(err);
     }
+    dispatch({
+      type: GET_NAME,
+      payload: {
+        username,
+      },
+    });
   };
 }
 
@@ -94,15 +101,18 @@ export function loadChat() {
   return async (dispatch) => {
     try {
       const dbChatRaw = await getChats();
-      const dbChat = dbChatRaw.rows._array;
-      console.log(dbChat);
+      const dbChatOrg = dbChatRaw.rows._array;
+      const dbChat = dbChatOrg.reverse();
+      //console.log(dbChat);
 
       const rowNumRaw = await getRowNum();
-      // socket.emit("rowNum", rowNum);
-      const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"]
-      console.log(rowNum);
 
-      messageIdScreen = rowNum ;
+      const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"];
+      console.log(rowNum);
+      const rowNumToSend = rowNum + 1;
+      // socket.emit("rowNum", rowNumToSend);
+
+      messageIdScreen = rowNum;
       messageIdChat = rowNum;
 
       const dbName = await getName();
@@ -114,6 +124,7 @@ export function loadChat() {
         type: LOAD_CHAT,
         payload: {
           dbChat,
+          username,
         },
       });
     } catch (error) {
@@ -131,6 +142,7 @@ const chatReducer = (state = initialState, action) => {
         action.payload.message,
         getTime()
       );
+      //console.log(state.user.name);
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
       const dataToSend = [username, action.payload.message, getTime()];
@@ -153,10 +165,19 @@ const chatReducer = (state = initialState, action) => {
     case LOAD_CHAT:
       return {
         ...state,
+        name: action.payload.username,
         chatList: action.payload.dbChat.map(
           (ch) =>
             new ChatItem(ch.id.toString(), ch.sender, ch.content, ch.timestamp)
         ),
+      };
+
+    case GET_NAME:
+      const name = action.payload.username;
+      const newUser = { name: name, identifier: "" };
+      return {
+        ...state,
+        user: newUser,
       };
 
     default:
