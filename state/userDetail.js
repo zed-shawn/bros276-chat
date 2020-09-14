@@ -35,7 +35,7 @@ export function sendChatStatus() {
     try {
       const rowNum = await getRowNum();
       //console.log(userDbResult);
-      socket.emit("rowNum", rowNum);
+     // socket.emit("rowNum", rowNum);
     } catch (error) {
       console.log(error);;
     }

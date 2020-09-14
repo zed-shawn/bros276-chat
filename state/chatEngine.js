@@ -110,7 +110,7 @@ export function loadChat() {
       const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"];
       console.log(rowNum);
       const rowNumToSend = rowNum + 1;
-      // socket.emit("rowNum", rowNumToSend);
+      socket.emit("rowNum", rowNumToSend);
 
       messageIdScreen = rowNum;
       messageIdChat = rowNum;
