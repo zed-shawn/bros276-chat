@@ -57,15 +57,15 @@ export default function chatScreen(props) {
   );
 
   useEffect(() => {
-    socket.on("message", (data) => {
-      const receivedMessage = JSON.parse(data);
-
-      let username = receivedMessage.username.toString();
+    socket.on("json", (data) => {
+     // const receivedMessage = JSON.parse(data);
+      console.log(data);
+      /* let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
       let time = receivedMessage.time.toString();
       let color = receivedMessage.color.toString();
 
-      dispatchRxMessage(username, message, time, color);
+      dispatchRxMessage(username, message, time, color); */
     });
   }, []);
 

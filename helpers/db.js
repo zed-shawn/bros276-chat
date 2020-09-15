@@ -4,7 +4,7 @@ const db = SQLite.openDatabase("local.db");
 
 export const init = () => {
   const promise = new Promise((resolve, reject) => {
-    /* db.transaction((tx) => {
+ /*    db.transaction((tx) => {
       tx.executeSql(
         "DROP TABLE chatStore",
         [],
