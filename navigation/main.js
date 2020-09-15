@@ -1,16 +1,17 @@
-import React from "react";
+
 import { createStackNavigator } from "react-navigation-stack";
 
-import { createAppContainer } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
 
 import userDetailsScreen from "../screens/userDetailsScreen";
 import chatScreen from "../screens/chatScreen";
+import AuthLoadingScreen  from "../screens/authLoadingScreen";
 
 const defaultStackNav = {
   headerStyle: {
     backgroundColor: "#ff863b",
   },
-  headerLeft:()=>null,
+  headerLeft: () => null,
   headerTintColor: "white",
   headerTitleStyle: {
     fontWeight: "bold",
@@ -19,7 +20,6 @@ const defaultStackNav = {
 
 const ChatNavigator = createStackNavigator(
   {
-    UserDetail: userDetailsScreen,
     Chat: chatScreen,
   },
   {
@@ -27,4 +27,21 @@ const ChatNavigator = createStackNavigator(
   }
 );
 
-export default createAppContainer(ChatNavigator);
+const AuthNavigator = createStackNavigator(
+  {
+    UserDetail: userDetailsScreen,
+  },
+  {
+    defaultNavigationOptions: defaultStackNav,
+  }
+);
+
+const AppNavigator = createSwitchNavigator({
+  AuthLoading: AuthLoadingScreen,
+  Chat: ChatNavigator,
+  Auth: AuthNavigator,
+},{
+  initialRouteName:'AuthLoading'
+});
+
+export default createAppContainer(AppNavigator);

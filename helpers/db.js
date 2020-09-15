@@ -163,3 +163,21 @@ export const getChats = () => {
   });
   return promise;
 };
+
+export const getAuth = () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT COUNT (hashID) FROM userDetail;",
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};
