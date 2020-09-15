@@ -28,7 +28,7 @@ export const init = () => {
         }
       );
     });
-  /*   db.transaction((tx) => {
+ /*    db.transaction((tx) => {
       tx.executeSql(
         "DROP TABLE userDetail",
         [],

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import { View, ActivityIndicator } from "react-native";
 import socket from "../components/socketInit";
 
@@ -11,7 +11,7 @@ export default function AuthLoadingScreen(props) {
 
   async function checkAuth() {
     const authRowRaw = await getAuth();
-    const authRow = rowNumRaw.rows._array[0]["COUNT (hashID)"];
+    const authRow = authRowRaw.rows._array[0]["COUNT (hashID)"];
     let isAuth = false;
     if (authRow === 1) {
       isAuth = true;
