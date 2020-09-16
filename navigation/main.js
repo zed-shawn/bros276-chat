@@ -23,6 +23,7 @@ const ChatNavigator = createStackNavigator(
     Chat: chatScreen,
   },
   {
+    initialRouteName: "Chat",
     defaultNavigationOptions: defaultStackNav,
   }
 );

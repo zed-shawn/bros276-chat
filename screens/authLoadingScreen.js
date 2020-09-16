@@ -1,8 +1,8 @@
-import React,{useEffect} from "react";
+import React, { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import socket from "../components/socketInit";
 
-import { getAuth, getHash } from "../helpers/db";
+import { getAuth, getHashAndName } from "../helpers/db";
 
 export default function AuthLoadingScreen(props) {
   useEffect(() => {
@@ -15,12 +15,22 @@ export default function AuthLoadingScreen(props) {
     let isAuth = false;
     if (authRow === 1) {
       isAuth = true;
-      const dbResult = await getHash();
+      const dbResult = await getHashAndName();
       let array = dbResult.rows._array;
       hash = array[0].hashID.toString();
+      name = array[0].name.toString();
+      //console.log("from auth screen", name);
       socket.emit("user", hash);
+      props.navigation.navigate({
+        routeName: "Chat",
+        key: 'Chat',
+        params: {
+          username: name,
+        },
+      });
     }
-    props.navigation.navigate(isAuth ? "Chat" : "Auth");
+    else if(authRow!==1){
+    props.navigation.navigate("Auth");}
   }
 
   return (

@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 
-const socket = io("http://3a4dec411a8b.ngrok.io/", {
+const socket = io("wss://cryptic-tor-50532.herokuapp.com", {
   transports: ["websocket"],
   reconnection: true,
 });

@@ -110,7 +110,7 @@ export function loadChat() {
       const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"];
       console.log(rowNum);
       const rowNumToSend = rowNum + 1;
-      socket.emit("rowNum", 7);
+      socket.emit("rowNum", rowNumToSend);
 
       messageIdScreen = rowNum;
       messageIdChat = rowNum;
@@ -119,7 +119,7 @@ export function loadChat() {
 
       let array = dbName.rows._array;
       username = array[0].name.toString();
-      console.log(username);
+      //console.log(username);
       dispatch({
         type: LOAD_CHAT,
         payload: {

@@ -28,7 +28,7 @@ export const init = () => {
         }
       );
     });
- /*    db.transaction((tx) => {
+/*     db.transaction((tx) => {
       tx.executeSql(
         "DROP TABLE userDetail",
         [],
@@ -74,11 +74,11 @@ export const addUserDetails = (hashID, name) => {
   return promise;
 };
 
-export const getHash = () => {
+export const getHashAndName = () => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT hashID FROM userDetail",
+        "SELECT * FROM userDetail",
         [],
         (_, result) => {
           resolve(result);

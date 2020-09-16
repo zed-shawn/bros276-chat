@@ -28,8 +28,9 @@ import * as action from "../state/chatEngine";
 } */
 
 export default function chatScreen(props) {
-  const username = props.navigation.getParam("username");
-  //console.log(username)
+  const username = useSelector((state)=> state.chat.user.name)
+//  const username = props.navigation.getParam("username");
+ // console.log("From ChatScreen",username)
   /* fetchName() */
   const [inputMessage, setInputMessage] = useState("");
   const [chatArray, addToChatArray] = useState([]);
@@ -57,16 +58,19 @@ export default function chatScreen(props) {
   );
 
   useEffect(() => {
-    socket.on("json", (data) => {
-     // const receivedMessage = JSON.parse(data);
+    socket.on("message", (data) => {
+     const receivedMessage = JSON.parse(data);
       console.log(data);
-      /* let username = receivedMessage.username.toString();
+      let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
       let time = receivedMessage.time.toString();
       let color = receivedMessage.color.toString();
 
-      dispatchRxMessage(username, message, time, color); */
+      dispatchRxMessage(username, message, time, color);
     });
+    socket.on("json", (data)=>{
+      console.log(data);
+    })
   }, []);
 
   const textInputHandler = (inputText) => {
