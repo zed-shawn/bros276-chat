@@ -1,7 +1,13 @@
 import ChatItem from "../models/chatArray";
 
 import socket from "../components/socketInit";
-import { getName, addChatTile, getChats, getRowNum } from "../helpers/db";
+import {
+  getName,
+  addChatTile,
+  getChats,
+  getRowNum,
+  getHashAndName,
+} from "../helpers/db";
 
 var username;
 
@@ -18,6 +24,7 @@ const RECV_CHAT = "receiveChat";
 const GET_NAME = "fetchName";
 const LOAD_CHAT = "loadChat";
 const GET_UNREAD = "loadUnread";
+const RECONN_DATA = "reconnectionData";
 
 let messageIdChat = 0;
 let messageIdScreen = 0;
@@ -146,6 +153,28 @@ export function loadUnread(msgArray) {
         dbChat,
       },
     });
+  };
+}
+
+export function reconnectionData() {
+  return async (dispatch) => {
+    try {
+      const dbResult = await getHashAndName();
+      let array = dbResult.rows._array;
+      hash = array[0].hashID;
+
+      const rowNumRaw = await getRowNum();
+      const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"];
+      //console.log(rowNum);
+      //const rowNumToSend = rowNum + 1;
+      if (typeof hash === "string") {
+        socket.emit("user", hash)
+        socket.emit("rowNum", rowNum);
+      }
+      //console.log(username);
+    } catch (error) {
+      console.log(error);
+    }
   };
 }
 
