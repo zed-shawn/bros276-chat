@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "black",
     justifyContent: "center",
+    alignItems:"center"
   },
   buttonText: {
     //fontFamily: "SenReg",
