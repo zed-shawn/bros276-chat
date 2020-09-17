@@ -57,6 +57,13 @@ export default function chatScreen(props) {
     [dispatch]
   );
 
+  const dispatchUnreadMessage = useCallback(
+    (msgArray) => {
+      dispatch(action.loadUnread(msgArray));
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     socket.on("message", (data) => {
      const receivedMessage = JSON.parse(data);
@@ -69,7 +76,8 @@ export default function chatScreen(props) {
       dispatchRxMessage(username, message, time, color);
     });
     socket.on("json", (data)=>{
-      console.log(data);
+      //console.log(data);
+      dispatchUnreadMessage(data)
     })
   }, []);
 

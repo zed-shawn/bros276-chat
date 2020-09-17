@@ -17,6 +17,7 @@ const SEND_CHAT = "sendChat";
 const RECV_CHAT = "receiveChat";
 const GET_NAME = "fetchName";
 const LOAD_CHAT = "loadChat";
+const GET_UNREAD = "loadUnread";
 
 let messageIdChat = 0;
 let messageIdScreen = 0;
@@ -103,14 +104,14 @@ export function loadChat() {
       const dbChatRaw = await getChats();
       const dbChatOrg = dbChatRaw.rows._array;
       const dbChat = dbChatOrg.reverse();
-      //console.log(dbChat);
+      console.log(dbChat);
 
       const rowNumRaw = await getRowNum();
 
       const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"];
       console.log(rowNum);
-      const rowNumToSend = rowNum + 1;
-      socket.emit("rowNum", rowNumToSend);
+      //const rowNumToSend = rowNum + 1;
+      socket.emit("rowNum", rowNum);
 
       messageIdScreen = rowNum;
       messageIdChat = rowNum;
@@ -130,6 +131,21 @@ export function loadChat() {
     } catch (error) {
       console.log(error);
     }
+  };
+}
+export function loadUnread(msgArray) {
+  return (dispatch) => {
+    const dbChat = msgArray.reverse();
+    const unreadLength = dbChat.length;
+    messageIdScreen = messageIdScreen + unreadLength;
+    messageIdChat = messageIdChat + unreadLength;
+    console.log(dbChat);
+    dispatch({
+      type: GET_UNREAD,
+      payload: {
+        dbChat,
+      },
+    });
   };
 }
 
@@ -169,6 +185,15 @@ const chatReducer = (state = initialState, action) => {
         chatList: action.payload.dbChat.map(
           (ch) =>
             new ChatItem(ch.id.toString(), ch.sender, ch.content, ch.timestamp)
+        ),
+      };
+
+    case GET_UNREAD:
+      return {
+        ...state,
+        chatList: action.payload.dbChat.map(
+          (ch) =>
+            new ChatItem(ch.id.toString(), ch.username, ch.message, ch.time)
         ),
       };
 
