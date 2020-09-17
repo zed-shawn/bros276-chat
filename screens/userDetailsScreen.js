@@ -35,7 +35,7 @@ export default function userDetailsScreen(props) {
   return (
     <View style={styles.root}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>bros 276pp</Text>
+        <Text style={styles.titleText}>B  R  O  S</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
@@ -49,6 +49,7 @@ export default function userDetailsScreen(props) {
       <View>
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
+      <View><Text>VER 1.0</Text></View>
     </View>
   );
 }
