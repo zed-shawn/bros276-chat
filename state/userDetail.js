@@ -57,7 +57,7 @@ const userReducer = (state = initialState, action) => {
         action.payload.identifier,
         action.payload.username,
       ];
-      socket.emit("identifier", sendFromUserDetails);
+      socket.emit("newUser", sendFromUserDetails);
       //console.log(sendFromUserDetails);
       return state;
     default:

@@ -15,7 +15,7 @@ export const init = () => {
           reject(err);
         }
       );
-    });  */
+    }); */ 
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS chatStore (id INTEGER PRIMARY KEY NOT NULL, sender TEXT NOT NULL, content TEXT NOT NULL, timestamp TEXT NOT NULL, color TEXT);",
@@ -28,7 +28,7 @@ export const init = () => {
         }
       );
     });
-    db.transaction((tx) => {
+/*     db.transaction((tx) => {
       tx.executeSql(
         "DROP TABLE userDetail",
         [],
@@ -39,7 +39,7 @@ export const init = () => {
           reject(err);
         }
       );
-    });
+    }); */
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS userDetail (hashID TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL);",
@@ -74,11 +74,11 @@ export const addUserDetails = (hashID, name) => {
   return promise;
 };
 
-export const getHash = () => {
+export const getHashAndName = () => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT hashID FROM userDetail",
+        "SELECT * FROM userDetail",
         [],
         (_, result) => {
           resolve(result);
@@ -151,6 +151,42 @@ export const getChats = () => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT * FROM chatStore",
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};
+
+export const getAuth = () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT COUNT (hashID) FROM userDetail;",
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, err) => {
+          reject(err);
+        }
+      );
+    });
+  });
+  return promise;
+};
+
+export const logout = () => {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DROP TABLE userDetail;",
         [],
         (_, result) => {
           resolve(result);
