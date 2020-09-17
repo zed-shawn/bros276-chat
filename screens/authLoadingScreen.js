@@ -23,18 +23,18 @@ export default function AuthLoadingScreen(props) {
       socket.emit("user", hash);
       props.navigation.navigate({
         routeName: "Chat",
-        key: 'Chat',
+        key: "Chat",
         params: {
           username: name,
         },
       });
+    } else if (authRow !== 1) {
+      props.navigation.navigate("Auth");
     }
-    else if(authRow!==1){
-    props.navigation.navigate("Auth");}
   }
 
   return (
-    <View>
+    <View style={{ alignItems: "center", justifyContent: "center", flex: 1 }}>
       <ActivityIndicator size="large" />
     </View>
   );

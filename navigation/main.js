@@ -30,7 +30,7 @@ const ChatNavigator = createStackNavigator(
 
 const AuthNavigator = createStackNavigator(
   {
-    UserDetail: userDetailsScreen,
+    Register: userDetailsScreen,
   },
   {
     defaultNavigationOptions: defaultStackNav,
