@@ -1,11 +1,10 @@
-
 import { createStackNavigator } from "react-navigation-stack";
 
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 
 import userDetailsScreen from "../screens/userDetailsScreen";
 import chatScreen from "../screens/chatScreen";
-import AuthLoadingScreen  from "../screens/authLoadingScreen";
+import AuthLoadingScreen from "../screens/authLoadingScreen";
 
 const defaultStackNav = {
   headerStyle: {
@@ -20,7 +19,7 @@ const defaultStackNav = {
 
 const ChatNavigator = createStackNavigator(
   {
-    Chat: chatScreen,
+    Chat: { screen: chatScreen, navigationOptions: () => ({ title: "Chat v1.4" }) },
   },
   {
     initialRouteName: "Chat",
@@ -37,12 +36,15 @@ const AuthNavigator = createStackNavigator(
   }
 );
 
-const AppNavigator = createSwitchNavigator({
-  AuthLoading: AuthLoadingScreen,
-  Chat: ChatNavigator,
-  Auth: AuthNavigator,
-},{
-  initialRouteName:'AuthLoading'
-});
+const AppNavigator = createSwitchNavigator(
+  {
+    AuthLoading: AuthLoadingScreen,
+    Chat: ChatNavigator,
+    Auth: AuthNavigator,
+  },
+  {
+    initialRouteName: "AuthLoading",
+  }
+);
 
 export default createAppContainer(AppNavigator);

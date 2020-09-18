@@ -15,7 +15,7 @@ export const init = () => {
           reject(err);
         }
       );
-    });  */
+    }); */ 
     db.transaction((tx) => {
       tx.executeSql(
         "CREATE TABLE IF NOT EXISTS chatStore (id INTEGER PRIMARY KEY NOT NULL, sender TEXT NOT NULL, content TEXT NOT NULL, timestamp TEXT NOT NULL, color TEXT);",
