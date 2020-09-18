@@ -111,7 +111,7 @@ export function loadChat() {
       const dbChatRaw = await getChats();
       const dbChatOrg = dbChatRaw.rows._array;
       const dbChat = dbChatOrg.reverse();
-      console.log(dbChat);
+      console.log("Chats from db",dbChat);
 
       const rowNumRaw = await getRowNum();
 
@@ -146,7 +146,7 @@ export function loadUnread(msgArray) {
     const unreadLength = dbChat.length;
     messageIdScreen = messageIdScreen + unreadLength;
     messageIdChat = messageIdChat + unreadLength;
-    console.log(dbChat);
+    console.log("Unread chats from server",dbChat);
     dispatch({
       type: GET_UNREAD,
       payload: {
