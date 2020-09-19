@@ -18,7 +18,7 @@ export const init = () => {
     }); */ 
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS chatStore (id INTEGER PRIMARY KEY NOT NULL, sender TEXT NOT NULL, content TEXT NOT NULL, timestamp TEXT NOT NULL, color TEXT);",
+        "CREATE TABLE IF NOT EXISTS chatStore (id INTEGER PRIMARY KEY NOT NULL, sender TEXT NOT NULL, content TEXT NOT NULL, timestamp TEXT NOT NULL);",
         [],
         (_, result) => {
           resolve(result);
@@ -110,12 +110,12 @@ export const getName = () => {
   return promise;
 };
 
-export const addChatTile = (id, sender, content, timestamp, color) => {
+export const addChatTile = (id, sender, content, timestamp) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "INSERT INTO chatStore (id, sender , content , timestamp , color ) VALUES(?,?,?,?,?);",
-        [id, sender, content, timestamp, color],
+        "INSERT INTO chatStore (id, sender , content , timestamp) VALUES(?,?,?,?);",
+        [id, sender, content, timestamp],
         (_, result) => {
           resolve(result);
         },
