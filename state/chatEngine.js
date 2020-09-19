@@ -113,7 +113,7 @@ const getHashFromDb = async () => {
 const getChatsFromDb = async () => {
   const dbChatRaw = await getChats();
   const dbChatOrg = dbChatRaw.rows._array;
-  const dbChat = dbChatOrg; //.reverse();// reverse this
+  const dbChat = dbChatOrg.reverse();// reverse this
   return dbChat;
 };
 //--

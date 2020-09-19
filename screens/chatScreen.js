@@ -35,7 +35,7 @@ export default function chatScreen(props) {
   const [inputMessage, setInputMessage] = useState("");
 
   const chatRepo = useSelector((state) => state.chat.chatList);
-  console.log(chatRepo);
+  //console.log(chatRepo);
   const dispatch = useDispatch();
 
   useEffect(() => {
