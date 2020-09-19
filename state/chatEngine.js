@@ -6,6 +6,7 @@ import {
   getChats,
   getRowNum,
 } from "../helpers/db";
+import { getAppLoadingLifecycleEmitter } from "expo/build/launch/AppLoading";
 
 var username;
 
@@ -29,7 +30,7 @@ var retrySendingRow = false;
 var retryFetchingUnread = false;
 var retrySendingUndelivered = false;
 
-var messagesFromDbLoaded = false;
+var messagesFromDbLoaded = true;
 var unreadFromServerLoaded = false;
 var tempDbIsEmpty = true;
 
@@ -112,7 +113,7 @@ const getHashFromDb = async () => {
 const getChatsFromDb = async () => {
   const dbChatRaw = await getChats();
   const dbChatOrg = dbChatRaw.rows._array;
-  const dbChat = dbChatOrg.reverse();
+  const dbChat = dbChatOrg; //.reverse();// reverse this
   return dbChat;
 };
 //--
@@ -138,7 +139,7 @@ export function connected() {
   return async (dispatch) => {
     try {
       const rowNum = await getLastRow();
-      console.log(rowNum);
+      //console.log("Rownum",rowNum);
       //const rowNumToSend = rowNum + 1;
       emitRowNum(rowNum);
       messageIdDb = rowNum;
@@ -154,11 +155,13 @@ export function loadChat() {
   return async (dispatch) => {
     try {
       const dbChat = await getChatsFromDb();
-      console.log("Chat from DB", dbChat);
+      //console.log("Chat from DB", dbChat);
       const rowNum = await getLastRow();
+      console.log("Rownum", rowNum);
       emitRowNum(rowNum);
       messageIdDb = rowNum;
       const username = await getNameFromDb();
+      //console.log(username);
       messagesFromDbLoaded = true;
       //console.log(username);
       dispatch({
@@ -176,14 +179,15 @@ export function loadChat() {
 
 export function loadUnread(msgArray) {
   return (dispatch) => {
-    const dbChat = msgArray.reverse();
+    const dbChat = msgArray.reverse(); //reverse this
+    console.log();
     if (messagesFromDbLoaded === true) {
       addUnreadToDb(msgArray);
     } else setTimeout(loadUnreadRetry(msgArray), 2000);
     //const unreadLength = dbChat.length;
     //messageIdScreen = messageIdScreen + unreadLength;
     //messageIdChat = messageIdChat + unreadLength;
-    console.log("Unread from server", dbChat);
+    ////////console.log("Unread from server", dbChat);
 
     dispatch({
       type: GET_UNREAD,
@@ -197,7 +201,7 @@ export function loadUnread(msgArray) {
 export function receivechat(username, message, time, color) {
   return async (dispatch) => {
     try {
-      await pushToDb(username, message, time); //color here as sending id is useless
+      await pushToDb(username, message, time);
       //console.log(userDbResult);
     } catch (error) {
       console.log(error);
@@ -239,20 +243,29 @@ export function sendchat(message) {
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
     case LOAD_CHAT:
+      //console.log(messageIdDb);
+      const updatedUser = {
+        name: `${action.payload.username}`,
+        identifier: "",
+      };
+      const listFromDb = action.payload.dbChat.map(
+        (ch) => new ChatItem(getIdScreen(), ch.sender, ch.content, ch.timestamp)
+      );
+      const updatedlistFromDb = [...listFromDb, ...state.chatList];
       return {
         ...state,
-        name: action.payload.username,
-        chatList: action.payload.dbChat.map(
-          (ch) =>
-            new ChatItem(getIdScreen(), ch.sender, ch.content, ch.timestamp)
-        ),
+        user: updatedUser,
+        chatList: updatedlistFromDb,
       };
     case GET_UNREAD:
+      console.log("UNREAD", action.payload.dbChat);
+      const listFromUnread = action.payload.dbChat.map(
+        (ch) => new ChatItem(getIdScreen(), ch.username, ch.message, ch.time)
+      );
+      const updatedlistFromUnread = [...listFromUnread, ...state.chatList];
       return {
         ...state,
-        chatList: action.payload.dbChat.map(
-          (ch) => new ChatItem(getIdScreen(), ch.username, ch.message, ch.time)
-        ),
+        chatList: updatedlistFromUnread,
       };
     case RECV_CHAT:
       const newRxChat = new ChatItem(
