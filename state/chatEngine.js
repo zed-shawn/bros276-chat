@@ -6,7 +6,6 @@ import {
   getChats,
   getRowNum,
 } from "../helpers/db";
-import { getAppLoadingLifecycleEmitter } from "expo/build/launch/AppLoading";
 
 var username;
 
@@ -17,6 +16,7 @@ const initialState = {
   },
   chatList: [],
 };
+
 
 const SEND_CHAT = "sendChat"; //Sends chat from chat screen to the server
 const RECV_CHAT = "receiveChat"; //Displays chat from server to the chat screen
@@ -35,6 +35,7 @@ var unreadFromServerLoaded = false;
 var tempDbIsEmpty = true;
 
 //Chat Functions
+
 
 let messageIdDb = 0;
 let messageIdScreen = 0;
@@ -227,6 +228,7 @@ export function sendchat(message) {
     } catch (error) {
       console.log(error);
     }
+
     dispatch({
       type: SEND_CHAT,
       payload: {
@@ -236,9 +238,11 @@ export function sendchat(message) {
   };
 }
 
+
 //-------------------------------------------------------------------------
 //Reducer ahead//
 //
+
 
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
