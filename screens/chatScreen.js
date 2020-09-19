@@ -8,7 +8,7 @@ import ChatBubbleReceive from "../components/chatBubbleReceive";
 import Button from "../components/Button";
 import socket from "../components/socketInit";
 import store from "../state/store";
-import { getName} from "../helpers/db";
+import { getName } from "../helpers/db";
 
 import * as action from "../state/chatEngine";
 
@@ -28,19 +28,18 @@ import * as action from "../state/chatEngine";
 } */
 
 export default function chatScreen(props) {
-  const username = useSelector((state)=> state.chat.user.name)
-//  const username = props.navigation.getParam("username");
- // console.log("From ChatScreen",username)
+  const username = useSelector((state) => state.chat.user.name);
+  //  const username = props.navigation.getParam("username");
+  // console.log("From ChatScreen",username)
   /* fetchName() */
   const [inputMessage, setInputMessage] = useState("");
-  const [chatArray, addToChatArray] = useState([]);
 
   const chatRepo = useSelector((state) => state.chat.chatList);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(action.loadChat());
-    dispatch(action.fetchName())
+    dispatch(action.fetchName());
   }, [dispatch]);
 
   const dispatchMessage = useCallback(
@@ -49,7 +48,12 @@ export default function chatScreen(props) {
     },
     [dispatch]
   );
-
+  const dispatchConnected = useCallback(
+    () => {
+      dispatch(action.connected());
+    },
+    [dispatch]
+  );
   const dispatchRxMessage = useCallback(
     (username, message, time, color) => {
       dispatch(action.receivechat(username, message, time, color));
@@ -66,7 +70,7 @@ export default function chatScreen(props) {
 
   useEffect(() => {
     socket.on("message", (data) => {
-     const receivedMessage = JSON.parse(data);
+      const receivedMessage = JSON.parse(data);
       console.log(data);
       let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
@@ -75,10 +79,15 @@ export default function chatScreen(props) {
 
       dispatchRxMessage(username, message, time, color);
     });
-    socket.on("json", (data)=>{
+    socket.on("json", (data) => {
       //console.log(data);
-      dispatchUnreadMessage(data)
-    })
+      dispatchUnreadMessage(data);
+    });
+    socket.on("status", (data) => {
+      if (data === "connected") {
+        dispatchConnected();
+      }
+    });
   }, []);
 
   const textInputHandler = (inputText) => {
