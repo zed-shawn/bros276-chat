@@ -71,7 +71,8 @@ export default function chatScreen(props) {
   useEffect(() => {
     socket.on("message", (data) => {
       const receivedMessage = JSON.parse(data);
-      console.log(data);
+     // console.log(data);
+
       let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
       let time = receivedMessage.time.toString();
@@ -98,7 +99,7 @@ export default function chatScreen(props) {
     if (inputMessage !== "") {
       let message = inputMessage;
       setInputMessage("");
-      console.log("button preseed");
+      //console.log("button preseed");
       dispatchMessage(message);
     }
   };
