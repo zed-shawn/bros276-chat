@@ -85,6 +85,8 @@ const pushToDb = async (sender, content, time) => {
 };
 
 const addUnreadToDb = async (msgArray) => {
+  //console.log(msgArray);
+  //msgArray.reverse()
   msgArray.map((ch) => pushToDb(ch.username, ch.message, ch.time));
 };
 
@@ -114,7 +116,9 @@ const getHashFromDb = async () => {
 const getChatsFromDb = async () => {
   const dbChatRaw = await getChats();
   const dbChatOrg = dbChatRaw.rows._array;
-  const dbChat = dbChatOrg.reverse();// reverse this
+  //console.log(dbChatOrg);
+  console.log(dbChatOrg);
+  const dbChat = dbChatOrg.reverse(); // reverse this
   return dbChat;
 };
 //--
@@ -180,11 +184,12 @@ export function loadChat() {
 
 export function loadUnread(msgArray) {
   return (dispatch) => {
-    const dbChat = msgArray.reverse(); //reverse this
-    console.log();
+    const dbChat = msgArray//.reverse(); //reverse this
+    const dbChatRev = msgArray.reverse();
+    console.log(dbChatRev);
     if (messagesFromDbLoaded === true) {
-      addUnreadToDb(msgArray);
-    } else setTimeout(loadUnreadRetry(msgArray), 2000);
+      addUnreadToDb(dbChatRev);
+    } else setTimeout(loadUnreadRetry(dbChatRev), 2000);
     //const unreadLength = dbChat.length;
     //messageIdScreen = messageIdScreen + unreadLength;
     //messageIdChat = messageIdChat + unreadLength;
@@ -255,14 +260,14 @@ const chatReducer = (state = initialState, action) => {
       const listFromDb = action.payload.dbChat.map(
         (ch) => new ChatItem(getIdScreen(), ch.sender, ch.content, ch.timestamp)
       );
-      const updatedlistFromDb = [...listFromDb, ...state.chatList];
+      const updatedlistFromDb = [...state.chatList, ...listFromDb];
       return {
         ...state,
         user: updatedUser,
         chatList: updatedlistFromDb,
       };
     case GET_UNREAD:
-      console.log("UNREAD", action.payload.dbChat);
+      //console.log("UNREAD", action.payload.dbChat);
       const listFromUnread = action.payload.dbChat.map(
         (ch) => new ChatItem(getIdScreen(), ch.username, ch.message, ch.time)
       );
