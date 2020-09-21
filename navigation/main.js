@@ -19,7 +19,7 @@ const defaultStackNav = {
 
 const ChatNavigator = createStackNavigator(
   {
-    Chat: { screen: chatScreen, navigationOptions: () => ({ title: "Chat v1.4" }) },
+    Chat: { screen: chatScreen, navigationOptions: () => ({ title: "Chat v1.5" }) },
   },
   {
     initialRouteName: "Chat",

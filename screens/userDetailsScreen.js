@@ -49,7 +49,7 @@ export default function userDetailsScreen(props) {
       <View>
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
-      <View><Text>VER 1.4</Text></View>
+      <View><Text>VER 1.5</Text></View>
     </View>
   );
 }

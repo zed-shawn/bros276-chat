@@ -20,7 +20,7 @@ export default function AuthLoadingScreen(props) {
       hash = array[0].hashID.toString();
       name = array[0].name.toString();
       //console.log("from auth screen", name);
-      //socket.emit("user", hash);
+      socket.emit("user", hash);
       props.navigation.navigate({
         routeName: "Chat",
         key: "Chat",
