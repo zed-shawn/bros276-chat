@@ -85,7 +85,8 @@ export default function chatScreen(props) {
       dispatchUnreadMessage(data);
     });
     socket.on("status", (data) => {
-      if (data === "connected") {
+      console.log(data);
+      if (data === 1) {
         dispatchConnected();
       }
     });

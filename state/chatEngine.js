@@ -17,7 +17,6 @@ const initialState = {
   chatList: [],
 };
 
-
 const SEND_CHAT = "sendChat"; //Sends chat from chat screen to the server
 const RECV_CHAT = "receiveChat"; //Displays chat from server to the chat screen
 const LOAD_CHAT = "loadChat"; // Loads chat from db, triggers only when screen loads
@@ -34,8 +33,9 @@ var messagesFromDbLoaded = true;
 var unreadFromServerLoaded = false;
 var tempDbIsEmpty = true;
 
-//Chat Functions
+var unreadAddedToDb = false;
 
+//Chat Functions
 
 let messageIdDb = 0;
 let messageIdScreen = 0;
@@ -60,11 +60,11 @@ const getTime = () => {
   return hours + ":" + min;
 };
 
-const loadUnreadRetry = (msgArray) => {
+/* const loadUnreadRetry = (msgArray) => {
   if (messagesFromDbLoaded === true) {
     addUnreadToDb(msgArray);
   } else setTimeout(loadUnreadRetry(msgArray), 2000);
-};
+}; */
 
 //-------------------------------------------------------------------------
 // Functions for CRUD on db, and emitting to server//
@@ -86,8 +86,9 @@ const pushToDb = async (sender, content, time) => {
 
 const addUnreadToDb = async (msgArray) => {
   //console.log(msgArray);
-  //msgArray.reverse()
-  msgArray.map((ch) => pushToDb(ch.username, ch.message, ch.time));
+  const newArray = msgArray.reverse();
+  newArray.map((ch) => pushToDb(ch.username, ch.message, ch.time));
+  unreadAddedToDb = true;
 };
 
 const getNameFromDb = async () => {
@@ -142,16 +143,18 @@ const emitHash = async (hash) => {
 
 export function connected() {
   return async (dispatch) => {
-    try {
-      const rowNum = await getLastRow();
-      //console.log("Rownum",rowNum);
-      //const rowNumToSend = rowNum + 1;
-      emitRowNum(rowNum);
-      messageIdDb = rowNum;
-      const hash = await getHashFromDb();
-      emitHash(hash);
-    } catch (error) {
-      console.log(error);
+    if (unreadAddedToDb === true) {
+      try {
+        const rowNum = await getLastRow();
+        //console.log("Rownum",rowNum);
+        //const rowNumToSend = rowNum + 1;
+        emitRowNum(rowNum);
+        messageIdDb = rowNum;
+        const hash = await getHashFromDb();
+        emitHash(hash);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 }
@@ -184,13 +187,13 @@ export function loadChat() {
 
 export function loadUnread(msgArray) {
   return (dispatch) => {
-    const dbChat = msgArray//.reverse(); //reverse this
+    const dbChat = msgArray; //.reverse(); //reverse this
     const dbChatRev = msgArray.reverse();
     console.log(dbChatRev);
-    if (messagesFromDbLoaded === true) {
-      addUnreadToDb(dbChatRev);
-    } else setTimeout(loadUnreadRetry(dbChatRev), 2000);
-    //const unreadLength = dbChat.length;
+    const unreadLength = dbChat.length;
+    if (unreadLength != 0) {
+      addUnreadToDb(dbChat);
+    } else unreadAddedToDb = true;
     //messageIdScreen = messageIdScreen + unreadLength;
     //messageIdChat = messageIdChat + unreadLength;
     ////////console.log("Unread from server", dbChat);
@@ -243,11 +246,9 @@ export function sendchat(message) {
   };
 }
 
-
 //-------------------------------------------------------------------------
 //Reducer ahead//
 //
-
 
 const chatReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -268,7 +269,8 @@ const chatReducer = (state = initialState, action) => {
       };
     case GET_UNREAD:
       //console.log("UNREAD", action.payload.dbChat);
-      const listFromUnread = action.payload.dbChat.map(
+      const chatUnreadRev = action.payload.dbChat.reverse();
+      const listFromUnread = chatUnreadRev.map(
         (ch) => new ChatItem(getIdScreen(), ch.username, ch.message, ch.time)
       );
       const updatedlistFromUnread = [...listFromUnread, ...state.chatList];
