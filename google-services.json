@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "959882454063",
+    "firebase_url": "https://bros-79cbf.firebaseio.com",
+    "project_id": "bros-79cbf",
+    "storage_bucket": "bros-79cbf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959882454063:android:965287adc2aa93149b12da",
+        "android_client_info": {
+          "package_name": "com.bro.bros"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "959882454063-n65o1c07u66jquelmsc3e4h0un2tierp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuBi4qSiGIzpAuC7vod83lU1F78vARRsU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "959882454063-n65o1c07u66jquelmsc3e4h0un2tierp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

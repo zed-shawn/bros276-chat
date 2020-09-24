@@ -17,7 +17,8 @@
     },
     "android": {
       "package": "com.bro.bros",
-      "versionCode": 1
+      "versionCode": 1,
+      "googleServicesFile": "./google-services.json"
     },
     "updates": {
       "fallbackToCacheTimeout": 100

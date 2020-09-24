@@ -1,17 +1,36 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, StyleSheet, Text, TextInput, Button } from "react-native";
 import { useDispatch } from "react-redux";
 import MD5 from "../helpers/md5";
+import { Notifications } from "expo";
 
 import { addName } from "../state/userDetail";
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
+  const [pushToken, setPushToken] = useState("Awaiting token");
+
   const dispatch = useDispatch();
 
   const textInputHandler = (inputText) => {
     setEnteredName(inputText);
   };
+
+  useEffect(() => {
+    const getToken = async () => {
+      try {
+        const notifData = await Notifications.getExpoPushTokenAsync();
+        const tokenOrg = notifData;
+        //const tokenTrimmed = tokenOrg.slice(18, -1);
+        setPushToken(tokenOrg);
+        console.log("token", tokenOrg);
+      } catch (err) {
+        const errString= JSON.stringify(err)
+        setPushToken(errString);
+      }
+    };
+    getToken();
+  }, []);
 
   const dispatchUsername = useCallback(
     (identifier, username) => {
@@ -20,10 +39,13 @@ export default function userDetailsScreen(props) {
     [dispatch]
   );
 
+  //console.log(tokenFirstRem);
   const inputButtonHandler = () => {
-    const userToLower = enteredName.toLowerCase();
-    const identifier = MD5(`${userToLower}`);
-    dispatchUsername(identifier, enteredName);
+    /*   const userToLower = enteredName.toLowerCase();
+    const identifier = MD5(`${userToLower}`); */
+
+    dispatchUsername(pushToken, enteredName);
+    console.log("state log", pushToken);
 
     props.navigation.navigate({
       routeName: "Chat",
@@ -35,7 +57,7 @@ export default function userDetailsScreen(props) {
   return (
     <View style={styles.root}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>B  R  O  S</Text>
+        <Text style={styles.titleText}>B R R O S</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
@@ -49,7 +71,10 @@ export default function userDetailsScreen(props) {
       <View>
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
-      <View><Text>VER 2.0</Text></View>
+      <View>
+        <Text>{pushToken}</Text>
+        {/* <Text>VER 2.1</Text> */}
+      </View>
     </View>
   );
 }
