@@ -18,7 +18,8 @@
     "android": {
       "package": "com.bro.bros",
       "versionCode": 1,
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
     },
     "updates": {
       "fallbackToCacheTimeout": 100

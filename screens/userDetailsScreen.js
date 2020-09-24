@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import { View, StyleSheet, Text, TextInput, Button } from "react-native";
 import { useDispatch } from "react-redux";
 import MD5 from "../helpers/md5";
-import { Notifications } from "expo";
+import * as Notifications from "expo-notifications";
 
 import { addName } from "../state/userDetail";
 
@@ -17,19 +17,16 @@ export default function userDetailsScreen(props) {
   };
 
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        const notifData = await Notifications.getExpoPushTokenAsync();
-        const tokenOrg = notifData;
-        //const tokenTrimmed = tokenOrg.slice(18, -1);
-        setPushToken(tokenOrg);
-        console.log("token", tokenOrg);
-      } catch (err) {
-        const errString= JSON.stringify(err)
-        setPushToken(errString);
-      }
-    };
-    getToken();
+    Notifications.getExpoPushTokenAsync()
+      .then((response) => {
+        const token = response.data;
+        setPushToken(token);
+        console.log(token);
+      })
+      .catch((err) => {
+        console.log(err);
+        return null;
+      });
   }, []);
 
   const dispatchUsername = useCallback(
@@ -57,7 +54,7 @@ export default function userDetailsScreen(props) {
   return (
     <View style={styles.root}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>B R R O S</Text>
+        <Text style={styles.titleText}>B R O S</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
@@ -72,8 +69,7 @@ export default function userDetailsScreen(props) {
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
       <View>
-        <Text>{pushToken}</Text>
-        {/* <Text>VER 2.1</Text> */}
+        <Text>VER 2.2</Text>
       </View>
     </View>
   );
