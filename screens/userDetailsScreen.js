@@ -1,17 +1,33 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, StyleSheet, Text, TextInput, Button } from "react-native";
 import { useDispatch } from "react-redux";
 import MD5 from "../helpers/md5";
+import * as Notifications from "expo-notifications";
 
 import { addName } from "../state/userDetail";
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
+  const [pushToken, setPushToken] = useState("Awaiting token");
+
   const dispatch = useDispatch();
 
   const textInputHandler = (inputText) => {
     setEnteredName(inputText);
   };
+
+  useEffect(() => {
+    Notifications.getExpoPushTokenAsync()
+      .then((response) => {
+        const token = response.data;
+        setPushToken(token);
+        console.log(token);
+      })
+      .catch((err) => {
+        console.log(err);
+        return null;
+      });
+  }, []);
 
   const dispatchUsername = useCallback(
     (identifier, username) => {
@@ -20,10 +36,13 @@ export default function userDetailsScreen(props) {
     [dispatch]
   );
 
+  //console.log(tokenFirstRem);
   const inputButtonHandler = () => {
-    const userToLower = enteredName.toLowerCase();
-    const identifier = MD5(`${userToLower}`);
-    dispatchUsername(identifier, enteredName);
+    /*   const userToLower = enteredName.toLowerCase();
+    const identifier = MD5(`${userToLower}`); */
+
+    dispatchUsername(pushToken, enteredName);
+    console.log("state log", pushToken);
 
     props.navigation.navigate({
       routeName: "Chat",
@@ -35,7 +54,7 @@ export default function userDetailsScreen(props) {
   return (
     <View style={styles.root}>
       <View style={styles.title}>
-        <Text style={styles.titleText}>B  R  O  S</Text>
+        <Text style={styles.titleText}>B R O S</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
@@ -49,7 +68,9 @@ export default function userDetailsScreen(props) {
       <View>
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
-      <View><Text>VER 2.0</Text></View>
+      <View>
+        <Text>VER 2.3</Text>
+      </View>
     </View>
   );
 }
