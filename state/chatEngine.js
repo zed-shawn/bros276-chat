@@ -1,10 +1,15 @@
 import ChatItem from "../models/chatArray";
 import socket from "../components/socketInit";
+import { useDispatch } from "react-redux";
 import {
   getHashAndName,
   addChatTile,
   getChats,
   getRowNum,
+  addToTemp,
+  removeFromTemp,
+  getRowFromTemp,
+  getRowNumTemp,
 } from "../helpers/db";
 
 var username;
@@ -22,6 +27,9 @@ const RECV_CHAT = "receiveChat"; //Displays chat from server to the chat screen
 const LOAD_CHAT = "loadChat"; // Loads chat from db, triggers only when screen loads
 const GET_UNREAD = "loadUnread"; // Displays chat from server, unread
 const CONNECTED = "connected"; // When connection is estabished,Sends hash & lastRow to server in case of reconnection
+const CHANGE_SENT = "changeSent";
+const SEND_UNSENT = "sendUnsent";
+const RECEIPT = "receipt";
 
 //Connection & State functions
 
@@ -39,6 +47,8 @@ var unreadAddedToDb = false;
 
 let messageIdDb = 0;
 let messageIdScreen = 0;
+let tempDbId = 0;
+let idForCallback = 0;
 const getIdDb = () => {
   let newID = ++messageIdDb;
   return newID;
@@ -46,6 +56,14 @@ const getIdDb = () => {
 const getIdScreen = () => {
   let newID = ++messageIdScreen;
   return newID.toString();
+};
+const getTempDbId = () => {
+  let newID = ++tempDbId;
+  return newID;
+};
+const getIdForCallback = () => {
+  let newID = ++idForCallback;
+  return newID;
 };
 
 const getTime = () => {
@@ -122,9 +140,19 @@ const getChatsFromDb = async () => {
   const dbChat = dbChatOrg.reverse(); // reverse this
   return dbChat;
 };
+
+const addChatToTemp = async (id, username, message, time) => {
+  /* addToTemp,
+  removeFromTemp,
+  getRowFromTemp, */
+  await addToTemp(id, username, message, time);
+};
+
+const emitUnsent = async () => {};
+
 //--
-const emitMessageToServer = async (username, message, time) => {
-  const dataToSend = [username, message, time];
+const emitMessageToServer = async (id, username, message, time) => {
+  const dataToSend = [id, username, message, time];
   //console.log(dataToSend);
   socket.emit("message", dataToSend);
 };
@@ -155,6 +183,51 @@ export function connected() {
       } catch (error) {
         console.log(error);
       }
+    }
+  };
+}
+
+export function sendUnsent() {
+  return async (dispatch) => {
+    try {
+      const rowNumRaw = await getRowNumTemp();
+      const rowNum = rowNumRaw.rows._array[0]["COUNT (id)"];
+      if (rowNum > 0) {
+        for (let i = 0; i < rowNum; i++) {
+          const dbChatRaw = await getRowFromTemp(i + 1);
+          const data = dbChatRaw.rows._array;
+          emitMessageToServer(
+            data.id,
+            data.sender,
+            data.content,
+            data.timestamp
+          );
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
+export function receipt(id) {
+  return async (dispatch) => {
+    try {
+      const dbChatRaw = await getRowFromTemp(id);
+      const data = dbChatRaw.rows._array;
+      console.log("id from server", id);
+      console.log("from temp db", data);
+      await removeFromTemp(id);
+      //await pushToDb(data.sender, data.content, data.timestamp);
+
+      dispatch({
+        type: RECEIPT,
+        payload: {
+          id,
+        },
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
 }
@@ -207,7 +280,7 @@ export function loadUnread(msgArray) {
   };
 }
 
-export function receivechat(username, message, time, color) {
+export function receivechat(username, message, time) {
   return async (dispatch) => {
     try {
       await pushToDb(username, message, time);
@@ -221,7 +294,6 @@ export function receivechat(username, message, time, color) {
         username,
         message,
         time,
-        color,
       },
     });
   };
@@ -230,19 +302,22 @@ export function receivechat(username, message, time, color) {
 export function sendchat(message) {
   return async (dispatch) => {
     try {
-      await pushToDb(username, message, getTime());
-      await emitMessageToServer(username, message, getTime());
+      const demmitID = new Date().getTime();
+      const id = demmitID;
+      await addChatToTemp(id, username, message, getTime());
+      // await pushToDb(username, message, getTime());
+      await emitMessageToServer(id, username, message, getTime());
       //console.log(userDbResult);
+      dispatch({
+        type: SEND_CHAT,
+        payload: {
+          message,
+          id,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
-
-    dispatch({
-      type: SEND_CHAT,
-      payload: {
-        message,
-      },
-    });
   };
 }
 
@@ -259,7 +334,8 @@ const chatReducer = (state = initialState, action) => {
         identifier: "",
       };
       const listFromDb = action.payload.dbChat.map(
-        (ch) => new ChatItem(getIdScreen(), ch.sender, ch.content, ch.timestamp)
+        (ch) =>
+          new ChatItem(getIdScreen(), ch.sender, ch.content, ch.timestamp, 1)
       );
       const updatedlistFromDb = [...state.chatList, ...listFromDb];
       return {
@@ -271,7 +347,7 @@ const chatReducer = (state = initialState, action) => {
       //console.log("UNREAD", action.payload.dbChat);
       const chatUnreadRev = action.payload.dbChat.reverse();
       const listFromUnread = chatUnreadRev.map(
-        (ch) => new ChatItem(getIdScreen(), ch.username, ch.message, ch.time)
+        (ch) => new ChatItem(getIdScreen(), ch.username, ch.message, ch.time, 1)
       );
       const updatedlistFromUnread = [...listFromUnread, ...state.chatList];
       return {
@@ -284,22 +360,46 @@ const chatReducer = (state = initialState, action) => {
         action.payload.username.toString(),
         action.payload.message.toString(),
         action.payload.time.toString(),
-        action.payload.color.toString()
+        1
       );
       const updatedRxList = [...state.chatList];
       updatedRxList.unshift(newRxChat);
       return { ...state, chatList: updatedRxList };
     case SEND_CHAT:
       const newChat = new ChatItem(
-        getIdScreen(),
+        action.payload.id.toString(),
         state.user.name,
         action.payload.message,
-        getTime()
+        getTime(),
+        0
       );
       //console.log(state.user.name);
       const updatedTxList = [...state.chatList];
       updatedTxList.unshift(newChat);
       return { ...state, chatList: updatedTxList };
+    case RECEIPT:
+      const id = action.payload.id.toString();
+      console.log("state", state);
+      //console.log(state.user.name);
+      const index = state.chatList.findIndex((el) => el.id === id);
+      console.log("index", index);
+      const updatedTxListUnsent = [...state.chatList];
+      const copyName = updatedTxListUnsent[index].sender
+      const copyMessage = updatedTxListUnsent[index].content
+      const copyTime = updatedTxListUnsent[index].timestamp
+      updatedTxListUnsent.splice(index, 1);
+      /* console.log("updated tx list", updatedTxListUnsent);
+      return { ...state, chatList: updatedTxListUnsent }; */
+      //////////////////////////////
+      const newChatUnsent = new ChatItem(
+        getIdScreen(),
+        copyName,
+        copyMessage,
+        copyTime,
+        1
+      );
+      updatedTxListUnsent.unshift(newChatUnsent);
+      return { ...state, chatList: updatedTxListUnsent };
     default:
       return state;
   }

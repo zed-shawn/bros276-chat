@@ -48,15 +48,12 @@ export default function chatScreen(props) {
     },
     [dispatch]
   );
-  const dispatchConnected = useCallback(
-    () => {
-      dispatch(action.connected());
-    },
-    [dispatch]
-  );
+  const dispatchConnected = useCallback(() => {
+    dispatch(action.connected());
+  }, [dispatch]);
   const dispatchRxMessage = useCallback(
-    (username, message, time, color) => {
-      dispatch(action.receivechat(username, message, time, color));
+    (username, message, time) => {
+      dispatch(action.receivechat(username, message, time));
     },
     [dispatch]
   );
@@ -68,21 +65,32 @@ export default function chatScreen(props) {
     [dispatch]
   );
 
+  const dispatchReceipt = useCallback(
+    (id) => {
+      dispatch(action.receipt(id));
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
     socket.on("message", (data) => {
       const receivedMessage = JSON.parse(data);
-     // console.log(data);
+      // console.log(data);
 
       let username = receivedMessage.username.toString();
       let message = receivedMessage.message.toString();
       let time = receivedMessage.time.toString();
-      let color = receivedMessage.color.toString();
+      //let color = receivedMessage.color.toString();
 
-      dispatchRxMessage(username, message, time, color);
+      dispatchRxMessage(username, message, time);
     });
     socket.on("json", (data) => {
       //console.log(data);
       dispatchUnreadMessage(data);
+    });
+    socket.on("receipt", (data) => {
+      //console.log(data);
+      dispatchReceipt(data);
     });
     socket.on("status", (data) => {
       console.log(data);
@@ -111,6 +119,7 @@ export default function chatScreen(props) {
         <ChatBubbleSend
           content={itemData.item.content}
           timestamp={itemData.item.timestamp}
+          sent={itemData.item.sent}
         />
       );
     } else if (itemData.item.sender != username) {
@@ -119,7 +128,7 @@ export default function chatScreen(props) {
           sender={itemData.item.sender}
           content={itemData.item.content}
           timestamp={itemData.item.timestamp}
-          color={itemData.item.color}
+          // color={itemData.item.color}
         />
       );
     }
