@@ -8,7 +8,7 @@ import { addName } from "../state/userDetail";
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
-  const [pushToken, setPushToken] = useState("haisha-huisha");
+  const [pushToken, setPushToken] = useState("skrrrt");
 
   const dispatch = useDispatch();
 
@@ -16,7 +16,7 @@ export default function userDetailsScreen(props) {
     setEnteredName(inputText);
   };
 
-/*   useEffect(() => {
+  useEffect(() => {
     Notifications.getExpoPushTokenAsync()
       .then((response) => {
         const token = response.data;
@@ -27,7 +27,7 @@ export default function userDetailsScreen(props) {
         console.log(err);
         return null;
       });
-  }, []); */
+  }, []);
 
   const dispatchUsername = useCallback(
     (identifier, username) => {

@@ -150,6 +150,12 @@ const addChatToTemp = async (id, username, message, time) => {
 
 const emitUnsent = async () => {};
 
+const getRowFromTempFN = async (id) => {
+  const dbChatRaw = await getRowFromTemp(id);
+  const data = dbChatRaw.rows._array;
+  return data;
+};
+
 //--
 const emitMessageToServer = async (id, username, message, time) => {
   const dataToSend = [id, username, message, time];
@@ -180,6 +186,21 @@ export function connected() {
         messageIdDb = rowNum;
         const hash = await getHashFromDb();
         emitHash(hash);
+        //
+        const rowNumRaw = await getRowNumTemp();
+        const rowNumTemp = rowNumRaw.rows._array[0]["COUNT (id)"];
+        if (rowNumTemp > 0) {
+          for (let i = 0; i < rowNumTemp; i++) {
+            const dbChatRaw = await getRowFromTemp(i + 1);
+            const data = dbChatRaw.rows._array;
+            emitMessageToServer(
+              data.id,
+              data.sender,
+              data.content,
+              data.timestamp
+            );
+          }
+        }
       } catch (error) {
         console.log(error);
       }
@@ -213,12 +234,11 @@ export function sendUnsent() {
 export function receipt(id) {
   return async (dispatch) => {
     try {
-      const dbChatRaw = await getRowFromTemp(id);
-      const data = dbChatRaw.rows._array;
-      console.log("id from server", id);
-      console.log("from temp db", data);
-      await removeFromTemp(id);
-      //await pushToDb(data.sender, data.content, data.timestamp);
+      const data = await getRowFromTempFN(id);
+      await pushToDb(data[0].sender, data[0].content, data[0].timestamp);
+      /*       console.log("id from server", id);*/
+      //console.log("from temp db sender", data[0].sender);
+      removeFromTemp(id);
 
       dispatch({
         type: RECEIPT,
@@ -262,7 +282,7 @@ export function loadUnread(msgArray) {
   return (dispatch) => {
     const dbChat = msgArray; //.reverse(); //reverse this
     const dbChatRev = msgArray.reverse();
-    console.log(dbChatRev);
+    console.log("unread from server",dbChatRev);
     const unreadLength = dbChat.length;
     if (unreadLength != 0) {
       addUnreadToDb(dbChat);
@@ -379,14 +399,14 @@ const chatReducer = (state = initialState, action) => {
       return { ...state, chatList: updatedTxList };
     case RECEIPT:
       const id = action.payload.id.toString();
-      console.log("state", state);
+      //console.log("state", state);
       //console.log(state.user.name);
       const index = state.chatList.findIndex((el) => el.id === id);
       console.log("index", index);
       const updatedTxListUnsent = [...state.chatList];
-      const copyName = updatedTxListUnsent[index].sender
-      const copyMessage = updatedTxListUnsent[index].content
-      const copyTime = updatedTxListUnsent[index].timestamp
+      const copyName = updatedTxListUnsent[index].sender;
+      const copyMessage = updatedTxListUnsent[index].content;
+      const copyTime = updatedTxListUnsent[index].timestamp;
       updatedTxListUnsent.splice(index, 1);
       /* console.log("updated tx list", updatedTxListUnsent);
       return { ...state, chatList: updatedTxListUnsent }; */
