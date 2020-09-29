@@ -8,7 +8,7 @@ import { addName } from "../state/userDetail";
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
-  const [pushToken, setPushToken] = useState("fromEmulator");
+  const [pushToken, setPushToken] = useState("Awaiting Token");
 
   const dispatch = useDispatch();
 
@@ -16,7 +16,7 @@ export default function userDetailsScreen(props) {
     setEnteredName(inputText);
   };
 
-  /* useEffect(() => {
+  useEffect(() => {
     Notifications.getExpoPushTokenAsync()
       .then((response) => {
         const token = response.data;
@@ -27,7 +27,7 @@ export default function userDetailsScreen(props) {
         console.log(err);
         return null;
       });
-  }, []); */
+  }, []);
 
   const dispatchUsername = useCallback(
     (identifier, username) => {
@@ -55,6 +55,7 @@ export default function userDetailsScreen(props) {
     <View style={styles.root}>
       <View style={styles.title}>
         <Text style={styles.titleText}>B R O S</Text>
+        <Text>!!DO NOT LOGIN!!</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
@@ -69,7 +70,8 @@ export default function userDetailsScreen(props) {
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
       <View>
-        <Text>VER 2.3.0</Text>
+        <Text>VER 3.0.temp</Text>
+        <Text>{pushToken}</Text>
       </View>
     </View>
   );
