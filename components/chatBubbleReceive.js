@@ -6,17 +6,21 @@ var min = new Date().getMinutes(); //To get the Current Minutes
 
 export default function ChatBubbleReceive(props) {
   const color = props.color;
+  let sender = props.sender;
+  let contentStyle = "normal";
+  if (sender === "typing") {
+    sender = "";
+    contentStyle = "italic";
+  }
   //console.log(color);
   return (
     <View style={styles.rootest}>
       <View style={styles.root}>
         <View style={styles.sender}>
-          <Text style={{ color: color, fontWeight: "bold" }}>
-            {props.sender}
-          </Text>
+          <Text style={{ color: color, fontWeight: "bold" }}>{sender}</Text>
         </View>
         <View>
-          <Text>{props.content}</Text>
+          <Text style={{ fontStyle: contentStyle }}>{props.content}</Text>
         </View>
         <View style={styles.time}>
           <Text style={styles.timeText}>{props.timestamp}</Text>
@@ -30,8 +34,7 @@ const styles = StyleSheet.create({
   rootest: {
     flexDirection: "row",
     justifyContent: "flex-start",
-    flex:1
-    
+    flex: 1,
   },
   root: {
     backgroundColor: "#fffdf0",

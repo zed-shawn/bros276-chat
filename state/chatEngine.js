@@ -22,14 +22,19 @@ const initialState = {
   chatList: [],
 };
 
+var usersTyping = [];
+
 const SEND_CHAT = "sendChat"; //Sends chat from chat screen to the server
-const RECV_CHAT = "receiveChat"; //Displays chat from server to the chat screen
+//const RECV_CHAT = "receiveChatSKRRT"; //Displays chat from server to the chat screen
+const RECV_CHAT_RMV_TYPING = "receiveChat";
 const LOAD_CHAT = "loadChat"; // Loads chat from db, triggers only when screen loads
 const GET_UNREAD = "loadUnread"; // Displays chat from server, unread
 const CONNECTED = "connected"; // When connection is estabished,Sends hash & lastRow to server in case of reconnection
 const CHANGE_SENT = "changeSent";
 const SEND_UNSENT = "sendUnsent";
 const RECEIPT = "receipt";
+//const ADD_TYPING = "typingHandlerSKRRT";
+const EDIT_TYPING = "typingHandler";
 
 //Connection & State functions
 
@@ -136,7 +141,7 @@ const getChatsFromDb = async () => {
   const dbChatRaw = await getChats();
   const dbChatOrg = dbChatRaw.rows._array;
   //console.log(dbChatOrg);
-  console.log(dbChatOrg);
+  //console.log(dbChatOrg);
   const dbChat = dbChatOrg.reverse(); // reverse this
   return dbChat;
 };
@@ -252,6 +257,21 @@ export function receipt(id) {
   };
 }
 
+export function typingHandler(username) {
+  return async (dispatch) => {
+    try {
+      dispatch({
+        type: EDIT_TYPING,
+        payload: {
+          username,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
 export function loadChat() {
   return async (dispatch) => {
     try {
@@ -282,7 +302,7 @@ export function loadUnread(msgArray) {
   return (dispatch) => {
     const dbChat = msgArray; //.reverse(); //reverse this
     const dbChatRev = msgArray.reverse();
-    console.log("unread from server",dbChatRev);
+    console.log("unread from server", dbChatRev);
     const unreadLength = dbChat.length;
     if (unreadLength != 0) {
       addUnreadToDb(dbChat);
@@ -308,14 +328,25 @@ export function receivechat(username, message, time) {
     } catch (error) {
       console.log(error);
     }
+
     dispatch({
-      type: RECV_CHAT,
+      type: RECV_CHAT_RMV_TYPING,
       payload: {
         username,
         message,
         time,
       },
     });
+    /*  else if (id === -1) {
+      dispatch({
+        type: RECV_CHAT,
+        payload: {
+          username,
+          message,
+          time,
+        },
+      });
+    } */
   };
 }
 
@@ -374,7 +405,8 @@ const chatReducer = (state = initialState, action) => {
         ...state,
         chatList: updatedlistFromUnread,
       };
-    case RECV_CHAT:
+  /*   case RECV_CHAT:
+      console.log("IT WAS STILL HERE");
       const newRxChat = new ChatItem(
         getIdScreen(),
         action.payload.username.toString(),
@@ -384,7 +416,7 @@ const chatReducer = (state = initialState, action) => {
       );
       const updatedRxList = [...state.chatList];
       updatedRxList.unshift(newRxChat);
-      return { ...state, chatList: updatedRxList };
+      return { ...state, chatList: updatedRxList }; */
     case SEND_CHAT:
       const newChat = new ChatItem(
         action.payload.id.toString(),
@@ -420,6 +452,90 @@ const chatReducer = (state = initialState, action) => {
       );
       updatedTxListUnsent.unshift(newChatUnsent);
       return { ...state, chatList: updatedTxListUnsent };
+
+    case EDIT_TYPING:
+      const usernameEditTyping = action.payload.username;
+      const idEditTyping = usersTyping.indexOf(usernameEditTyping);
+      //console.log("typing array id", id);
+      if (idEditTyping === -1) {
+        usersTyping.push(usernameEditTyping);
+        console.log("USERS TYPING ARRAY", usersTyping);
+        const usernameToAddTyping = usernameEditTyping;
+        const content = `${usernameToAddTyping}` + " is typing...";
+        const newAddTyping = new ChatItem(
+          usernameToAddTyping,
+          "typing",
+          content,
+          "",
+          1
+        );
+        const addingTypingList = [...state.chatList];
+        addingTypingList.unshift(newAddTyping);
+        //console.log(addingTypingList);
+        // console.log("IT WAS HERE AGAIN");
+        return { ...state, chatList: addingTypingList };
+      } else if (idEditTyping !== -1) {
+        usersTyping.splice(idEditTyping, 1);
+        console.log("DUPLICATE MAXX");
+        const usernameToRemoveTyping = usernameEditTyping;
+        const indexRMV = state.chatList.findIndex(
+          (el) => el.id === usernameToRemoveTyping
+        );
+        console.log("indexRMV", indexRMV);
+        const removeTypingList = [...state.chatList];
+        removeTypingList.splice(indexRMV, 1);
+        return { ...state, chatList: removeTypingList };
+      }
+    /*  case ADD_TYPING:
+      const usernameToAddTyping = action.payload.username;
+      const content = `${usernameToAddTyping}` + " is typing...";
+      const newAddTyping = new ChatItem(
+        usernameToAddTyping,
+        "typing",
+        content,
+        "",
+        1
+      );
+      const addingTypingList = [...state.chatList];
+      addingTypingList.unshift(newAddTyping);
+      //console.log(addingTypingList);
+      // console.log("IT WAS HERE AGAIN");
+      return { ...state, chatList: addingTypingList }; */
+
+    /*   case RMV_TYPING:
+      const usernameToRemoveTyping = action.payload.username;
+      const indexRMV = state.chatList.findIndex(
+        (el) => el.id === usernameToRemoveTyping
+      );
+      console.log("indexRMV", indexRMV);
+      const removeTypingList = [...state.chatList];
+      removeTypingList.splice(indexRMV, 1);
+      return { ...state, chatList: removeTypingList }; */
+
+    case RECV_CHAT_RMV_TYPING:
+      const usernameToRemoveReceivedTyping = action.payload.username;
+      const RCRTid = usersTyping.indexOf(usernameToRemoveReceivedTyping);
+      //console.log("indexRCVD", indexRCVD);
+      /////////////////
+      const newremoveReceivedList = new ChatItem(
+        getIdScreen(),
+        action.payload.username.toString(),
+        action.payload.message.toString(),
+        action.payload.time.toString(),
+        1
+      );
+      const removeReceivedList = [...state.chatList];
+      if (RCRTid !== -1) {
+        usersTyping.splice(RCRTid, 1);
+        console.log("DUPLICATE TRAXX");
+        const indexRCVD = state.chatList.findIndex(
+          (el) => el.id === usernameToRemoveReceivedTyping
+        );
+        removeReceivedList.splice(indexRCVD, 1);
+      }
+      removeReceivedList.unshift(newremoveReceivedList);
+      return { ...state, chatList: removeReceivedList };
+
     default:
       return state;
   }
