@@ -4,7 +4,7 @@ import { View, StyleSheet, Text } from "react-native";
 var hours = new Date().getHours(); //To get the Current Hours
 var min = new Date().getMinutes(); //To get the Current Minutes
 
-export default function ChatBubbleReceive(props) {
+export default function ChatBubbleTyping(props) {
   const color = props.color;
   let sender = props.sender;
   let contentStyle = "normal";
@@ -16,14 +16,8 @@ export default function ChatBubbleReceive(props) {
   return (
     <View style={styles.rootest}>
       <View style={styles.root}>
-        <View style={styles.sender}>
-          <Text style={{ color: color, fontWeight: "bold" }}>{sender}</Text>
-        </View>
         <View>
           <Text style={{ fontStyle: contentStyle }}>{props.content}</Text>
-        </View>
-        <View style={styles.time}>
-          <Text style={styles.timeText}>{props.timestamp}</Text>
         </View>
       </View>
     </View>
