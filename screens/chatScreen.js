@@ -5,6 +5,7 @@ import { View, StyleSheet, TextInput, FlatList } from "react-native";
 
 import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
+import ChatBubbleTyping from "../components/chatBubbleTyping"
 import Button from "../components/Button";
 import socket from "../components/socketInit";
 import store from "../state/store";
@@ -33,6 +34,7 @@ export default function chatScreen(props) {
   // console.log("From ChatScreen",username)
   /* fetchName() */
   const [inputMessage, setInputMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
   const chatRepo = useSelector((state) => state.chat.chatList);
   //console.log(chatRepo);
@@ -41,6 +43,22 @@ export default function chatScreen(props) {
   useEffect(() => {
     dispatch(action.loadChat());
   }, [dispatch]);
+
+  /*  useEffect(() => {
+    setTyping;
+  }, [inputMessage]); */
+
+  /*  const setTyping = () => {
+    if (inputMessage !== "" && isTyping === false) {
+      setIsTyping(true);
+      socket.emit("typing", username);
+      console.log("emitted typing 1");
+    } else if (inputMessage === "" && isTyping === true) {
+      setIsTyping(false);
+      socket.emit("typing", username);
+      console.log("emitted typing 2");
+    }
+  }; */
 
   const dispatchMessage = useCallback(
     (inputMessage) => {
@@ -61,6 +79,13 @@ export default function chatScreen(props) {
   const dispatchUnreadMessage = useCallback(
     (msgArray) => {
       dispatch(action.loadUnread(msgArray));
+    },
+    [dispatch]
+  );
+
+  const dispatchTypingHandler = useCallback(
+    (name) => {
+      dispatch(action.typingHandler(name));
     },
     [dispatch]
   );
@@ -88,6 +113,10 @@ export default function chatScreen(props) {
       //console.log(data);
       dispatchUnreadMessage(data);
     });
+    socket.on("typing", (data) => {
+      console.log("TYPING RECEIVED", data);
+      dispatchTypingHandler(data);
+    });
     socket.on("receipt", (data) => {
       //console.log(data);
       dispatchReceipt(data);
@@ -102,11 +131,22 @@ export default function chatScreen(props) {
 
   const textInputHandler = (inputText) => {
     setInputMessage(inputText);
+
+    if (inputText !== "" && isTyping === false) {
+      setIsTyping(true);
+      socket.emit("typing", username);
+      console.log("emitted typing 1");
+    } else if (inputText === "" && isTyping === true) {
+      setIsTyping(false);
+      socket.emit("typing", username);
+      console.log("emitted typing 2");
+    }
   };
 
   const sendHandler = () => {
     if (inputMessage !== "") {
       let message = inputMessage;
+      setIsTyping(false);
       setInputMessage("");
       //console.log("button preseed");
       dispatchMessage(message);
@@ -120,6 +160,16 @@ export default function chatScreen(props) {
           content={itemData.item.content}
           timestamp={itemData.item.timestamp}
           sent={itemData.item.sent}
+        />
+      );
+    } else if (itemData.item.sender === "typing") {
+      //console.log("YAHAN TAK SAHI HAI");
+      return (
+        <ChatBubbleTyping
+          sender={itemData.item.sender}
+          content={itemData.item.content}
+          timestamp={itemData.item.timestamp}
+          // color={itemData.item.color}
         />
       );
     } else if (itemData.item.sender != username) {
