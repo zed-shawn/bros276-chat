@@ -5,6 +5,7 @@ import { View, StyleSheet, TextInput, FlatList } from "react-native";
 
 import ChatBubbleSend from "../components/chatBubbleSend";
 import ChatBubbleReceive from "../components/chatBubbleReceive";
+import ChatBubbleTyping from "../components/chatBubbleTyping"
 import Button from "../components/Button";
 import socket from "../components/socketInit";
 import store from "../state/store";
@@ -164,7 +165,7 @@ export default function chatScreen(props) {
     } else if (itemData.item.sender === "typing") {
       //console.log("YAHAN TAK SAHI HAI");
       return (
-        <ChatBubbleReceive
+        <ChatBubbleTyping
           sender={itemData.item.sender}
           content={itemData.item.content}
           timestamp={itemData.item.timestamp}

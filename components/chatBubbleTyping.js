@@ -1,0 +1,57 @@
+import React from "react";
+import { View, StyleSheet, Text } from "react-native";
+
+var hours = new Date().getHours(); //To get the Current Hours
+var min = new Date().getMinutes(); //To get the Current Minutes
+
+export default function ChatBubbleTyping(props) {
+  const color = props.color;
+  let sender = props.sender;
+  let contentStyle = "normal";
+  if (sender === "typing") {
+    sender = "";
+    contentStyle = "italic";
+  }
+  //console.log(color);
+  return (
+    <View style={styles.rootest}>
+      <View style={styles.root}>
+        <View>
+          <Text style={{ fontStyle: contentStyle }}>{props.content}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  rootest: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flex: 1,
+  },
+  root: {
+    backgroundColor: "#fffdf0",
+    elevation: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    maxWidth: "80%",
+    marginVertical: 5,
+    //maxWidth:"80%"
+
+    //marginRight: "60%",
+  },
+  time: {
+    alignItems: "flex-end",
+  },
+  timeText: {
+    color: "grey",
+  },
+  senderText: {},
+  sender: {
+    alignItems: "flex-start",
+    marginBottom: 3,
+  },
+});
