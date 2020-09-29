@@ -1,10 +1,10 @@
 class ChatItem {
-  constructor(id, sender, content, timestamp, color) {
+  constructor(id, sender, content, timestamp, sent) {
     this.id = id;
     this.sender = sender;
     this.content = content;
     this.timestamp = timestamp;
-    this.color = color;
+    this.sent = sent;
   }
 }
 

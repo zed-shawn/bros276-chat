@@ -8,7 +8,7 @@ import { addName } from "../state/userDetail";
 
 export default function userDetailsScreen(props) {
   const [enteredName, setEnteredName] = useState("");
-  const [pushToken, setPushToken] = useState("Awaiting token");
+  const [pushToken, setPushToken] = useState("skrrrt");
 
   const dispatch = useDispatch();
 

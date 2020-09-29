@@ -5,6 +5,6 @@ const socket = io("wss://cryptic-tor-50532.herokuapp.com", {
   reconnection: true,
 });
 
-export default socket
+export default socket;
 
 // heroku: wss://cryptic-tor-50532.herokuapp.com
