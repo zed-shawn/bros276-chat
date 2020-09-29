@@ -5,6 +5,12 @@ var hours = new Date().getHours(); //To get the Current Hours
 var min = new Date().getMinutes(); //To get the Current Minutes
 
 export default function ChatBubbleSend(props) {
+  let sentState
+  if (props.sent===0){
+    sentState='🕔'
+  } else if (props.sent===1){
+    sentState='✔'
+  }
   return (
     <View style={styles.rootest}>
       <View style={styles.root}>
@@ -13,6 +19,7 @@ export default function ChatBubbleSend(props) {
         </View>
         <View style={styles.time}>
           <Text style={styles.timeText}>{props.timestamp}</Text>
+          <Text style={styles.timeText}> {sentState}</Text>
         </View>
       </View>
     </View>
@@ -20,9 +27,9 @@ export default function ChatBubbleSend(props) {
 }
 
 const styles = StyleSheet.create({
-  rootest:{
-    flexDirection:'row',
-    justifyContent:'flex-end'
+  rootest: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   root: {
     backgroundColor: "#fffdf0",
@@ -38,6 +45,7 @@ const styles = StyleSheet.create({
   },
   time: {
     alignItems: "flex-end",
+    flexDirection: "row",
   },
   timeText: {
     color: "grey",
