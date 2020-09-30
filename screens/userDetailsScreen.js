@@ -55,7 +55,6 @@ export default function userDetailsScreen(props) {
     <View style={styles.root}>
       <View style={styles.title}>
         <Text style={styles.titleText}>B R O S</Text>
-        <Text>!!DO NOT LOGIN!!</Text>
       </View>
       <View style={styles.inputButton}>
         <TextInput
@@ -70,7 +69,7 @@ export default function userDetailsScreen(props) {
         <Button onPress={inputButtonHandler} title="Join Chat!" color="black" />
       </View>
       <View>
-        <Text>VER 3.0.temp</Text>
+        <Text>VER 3.0</Text>
         <Text>{pushToken}</Text>
       </View>
     </View>
